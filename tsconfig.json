@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "target": "ESNext",
+        "types": ["node", "jest"],
+        "strictNullChecks": true // 반드시 키는게 좋은 설정. null과 undefined를 엄격히 구분. false인 경우 모든 타입의 서브 타입(유니온)으로 null | undefined가 추가된다. hover시 뜨는 타입 힌트로는 안보이나 null | undefined가 될 수 있음을 암시한다.
+    },
+    "strict": true,
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "**/*.test.ts"]
+}
