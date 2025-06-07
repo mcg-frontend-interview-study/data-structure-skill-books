@@ -2,7 +2,8 @@
   "type": "module",
   "scripts": {
     "start": "npx ts-node",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage --coverageReporters=text"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
