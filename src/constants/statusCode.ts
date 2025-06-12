@@ -10,5 +10,6 @@ export type StatusCode = (typeof STATUS_CODE)[keyof typeof STATUS_CODE];
 // 액션(ex delete) 메서드의 return type
 export type ActionStatusCode = typeof STATUS_CODE.FAIL | typeof STATUS_CODE.SUCCESS;
 
+export type ActionHasResultStatusCode<Result> = typeof STATUS_CODE.FAIL | Result;
 // 탐색(ex find) 메서드의 return type
 export type FindStatusCode<FoundValue> = typeof STATUS_CODE.NOT_FOUND | FoundValue;
