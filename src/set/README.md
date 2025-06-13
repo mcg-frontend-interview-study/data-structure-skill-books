@@ -32,7 +32,7 @@
 먼저 추가는 `Array.push`를 사용해서 배열의 끝에 원소를 하나 추가하여 O(1)이 걸린다. 그러나 배열은 중복을 허용하므로 리스트를 순회하여 같은 값이 있는 경우 추가하지 않아야하므로 순회하는 시간인 O(N)이 걸리게 된다.
 
 ```js
-const isDuplicate = list.find((element) => element.id === id);
+const isDuplicate = list.find(element => element.id === id);
 if (!isDuplicate) list.push(element);
 ```
 
@@ -57,11 +57,11 @@ A집합과 B집합의 공통요소를 가져오려면 특정 집합을 하나 �
 이 때 `Array.some`를 사용하여 동일한 원소가 있는지를 판별하며 이 메서드의 시간복잡도는 O(M)이다. a집합을 순회하며 O(N) b집합에 포함되어 있는지를 검사하므로 O(M) 총 `O(N * M)`이 걸리게 된다.
 
 ```js
-const a = [{ id: 1 }, { id: 2 }, { id: 3 }];
-const b = [{ id: 2 }, { id: 4 }, { id: 5 }, { id: 6 }];
+const a = [{id: 1}, {id: 2}, {id: 3}];
+const b = [{id: 2}, {id: 4}, {id: 5}, {id: 6}];
 
-const intersection = a.filter((itemA) => {
-  return b.some((itemB) => itemB.id === itemA.id);
+const intersection = a.filter(itemA => {
+  return b.some(itemB => itemB.id === itemA.id);
 });
 ```
 
@@ -77,11 +77,11 @@ A집합과 B집합 중 A집합에만 포함된 요소를 가져오려면 A집합
 이 때 `Array.some`를 사용하여 동일한 원소가 있는지를 판별하며 이 메서드의 시간복잡도는 O(M)이다. a집합을 순회하며 O(N) b집합에 포함되어 있는지를 검사하므로 O(M) 총 `O(N * M)`이 걸리게 된다.
 
 ```js
-const a = [{ id: 1 }, { id: 2 }, { id: 3 }];
-const b = [{ id: 2 }, { id: 4 }, { id: 5 }, { id: 6 }];
+const a = [{id: 1}, {id: 2}, {id: 3}];
+const b = [{id: 2}, {id: 4}, {id: 5}, {id: 6}];
 
-const differences = a.filter((itemA) => {
-  return !b.some((itemB) => itemB.id === itemA.id);
+const differences = a.filter(itemA => {
+  return !b.some(itemB => itemB.id === itemA.id);
 });
 ```
 
@@ -99,10 +99,10 @@ A집합의 크기가 N, B집합의 크기가 M이라고 했을 때 두 집합을
 이 시간복잡도는 A배열을 전개하고 `O(N)` 차집합을 구해서 `O(N * M)` 합치므로 `O(N + N * M)`이 된다.
 
 ```js
-const a = [{ id: 1 }, { id: 2 }, { id: 3 }];
-const b = [{ id: 2 }, { id: 4 }, { id: 5 }, { id: 6 }];
+const a = [{id: 1}, {id: 2}, {id: 3}];
+const b = [{id: 2}, {id: 4}, {id: 5}, {id: 6}];
 
-const union = [...a, ...b.filter((itemB) => !a.some((itemA) => itemA.id === itemB.id))];
+const union = [...a, ...b.filter(itemB => !a.some(itemA => itemA.id === itemB.id))];
 ```
 
 ## 코드 구현
@@ -181,7 +181,19 @@ delete(value: T[keyof T]): void {
 
 ### 3. 교집합
 
-위에 서술한 교집합의 구현을 정리하자면 작은 집합을 찾아 순회하며 큰 집합에 속한지 확인 후 그렇다면 추가하는 것이다.
+위에 서술한 교집합은 작은 집합을 찾아 순회하며 큰 집합에 속한지 확인 후 그렇다면 추가하는 것이다. 그러나 이를 실제로 사용할 때 고려해야 할 점이 있는데 현재 set과 other set에 같은 key가 있고 다른 값을 가질 경우이다.
+
+예시를 들면 아래와 같은 경우인데 setA는 id: 1, name: cookie를 갖고 있고, setB는 id: 1, name: weadie를 갖고 있다.
+여기서 교집합을 했을 때 내부 로직은 key인 id만으로 판별하기 때문에 어떤 값을 교집합으로 주어야할지 불명확해진다.
+
+그래서 실제 교집합 구현에서는 함수를 호출하는 쪽인 setA를 기준으로 내보내준다. 그래서 아래 결과는 setA의 원소인 cookie를 반환하게 된다.
+
+```js
+const setA = new KeyObjectSet([{id: 1, name: 'cookie'}], 'id');
+const setB = new KeyObjectSet([{id: 1, name: 'weadie'}], 'id');
+
+console.log(setA.intersection(setB)); // cookie일까 weadie일까?
+```
 
 이를 구현한 결과는
 
@@ -192,9 +204,9 @@ intersection(otherSet: KeyObjectSet<T>): KeyObjectSet<T> {
 
   const resultSet = new KeyObjectSet<T>([], this.key);
 
-  for (const key of smaller.keySet) {
-    if (larger.has(key)) {
-      const item = smaller.dataMap.get(key);
+  for (const key of this.keySet) {
+    if (otherSet.has(key)) {
+      const item = this.dataMap.get(key);
       if (item) resultSet.add(item);
     }
   }
@@ -270,19 +282,32 @@ console.log(setA.difference(setB).values()); // [{"id": 2, "name": "weadie"}, {"
 
 ### 5. 합집합
 
-합집합은 현재 set에 다른 집합의 내용을 순회하며 현재 set에 추가해주는 방식으로 구현했다.
+합집합은 현재 set에 다른 집합의 내용을 순회하며 현재 set에 추가해주는 방식으로 구현했다. 그러나 이 역시 intersection과 비슷하게 실제로 사용할 때 고려해야 할 점이 있는데 현재 set과 other set에 같은 key가 있고 다른 값을 가질 경우이다.
+
+예시를 들면 아래와 같은 경우인데 setA는 id: 1, name: cookie를 갖고 있고, setB는 id: 1, name: weadie를 갖고 있다.
+여기서 교집합을 했을 때 내부 로직은 key인 id만으로 판별하기 때문에 어떤 값을 합집합으로 해야할지 애매해진다.
+
+그래서 실제 합집합 구현에서는 함수를 호출하는 쪽인 setA를 기준으로 합친다. 그래서 먼저 setA의 값을 먼저 추가한 뒤 setB를 순회하며 setA에 없는 값만 추가해주는 방식으로 구현했다.
 
 이를 구현한 결과는
 
 ```js
-union(otherSet: KeyObjectSet<T>): KeyObjectSet<T> {
-  const result = new KeyObjectSet<T>(this.values(), this.key);
-  for (const item of otherSet.values()) {
-    result.add(item);
-  }
+  union(otherSet: KeyObjectSet<T>): KeyObjectSet<T> {
+    const result = new KeyObjectSet<T>(this.values(), this.key);
 
-  return result;
-}
+    for (const item of this.values()) {
+      result.add(item);
+    }
+
+    for (const item of otherSet.values()) {
+      const keyValue = item[this.key];
+      if (!this.has(keyValue)) {
+        result.add(item);
+      }
+    }
+
+    return result;
+  }
 ```
 
 아래는 union의 사용 예시이다.
@@ -296,7 +321,7 @@ const a: DataType[] = [
 ];
 
 const b: DataType[] = [
-  { id: 1, name: "cookie" },
+  { id: 1, name: "weadie" },
   { id: 4, name: "sunday" },
   { id: 5, name: "soosoo" },
 ];
