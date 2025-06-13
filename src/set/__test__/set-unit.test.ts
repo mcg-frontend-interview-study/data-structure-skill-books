@@ -20,7 +20,7 @@ const testSetOperationValidation = (
   });
 };
 
-describe('Set Test', () => {
+describe('Set Unit Test', () => {
   let sampleList: DataType[] = [
     {id: 1, name: 'cookie'},
     {id: 2, name: 'weadie'},
