@@ -143,7 +143,7 @@ export class BST<T extends any> {
     private _insertFirst(value: T) {
         const node = new BSTNode<T>(value);
 
-        this._root = node;
+        this._setRoot(node);
         this._addSize();
     }
 
@@ -153,30 +153,35 @@ export class BST<T extends any> {
         if (rootNode === null) {
             return STATUS_CODE.NOT_FOUND;
         } else {
+            const comparator = this._getComparator();
             let parentNode = rootNode;
-            let parentValue = parentNode.getValue();
 
             while (true) {
-                if (parentValue === value) {
-                    return parentNode;
-                } else if (parentValue < value) {
-                    const rightNode = parentNode.getRight();
+                const comparisionResult = comparator(value, parentNode.getValue());
 
-                    if (rightNode === null) {
-                        return STATUS_CODE.NOT_FOUND;
-                    } else {
-                        parentNode = rightNode;
-                        continue;
-                    }
-                } else {
-                    const leftNode = parentNode.getLeft();
+                switch (comparisionResult) {
+                    case COMPARISION_RESULT.EQUAL:
+                        return parentNode;
 
-                    if (leftNode === null) {
-                        return STATUS_CODE.NOT_FOUND;
-                    } else {
-                        parentNode = leftNode;
-                        continue;
-                    }
+                    case COMPARISION_RESULT.GREATER_THAN:
+                        const rightNode = parentNode.getRight();
+
+                        if (rightNode === null) {
+                            return STATUS_CODE.NOT_FOUND;
+                        } else {
+                            parentNode = rightNode;
+                            continue;
+                        }
+
+                    case COMPARISION_RESULT.LESS_THAN:
+                        const leftNode = parentNode.getLeft();
+
+                        if (leftNode === null) {
+                            return STATUS_CODE.NOT_FOUND;
+                        } else {
+                            parentNode = leftNode;
+                            continue;
+                        }
                 }
             }
         }
@@ -214,7 +219,11 @@ export class BST<T extends any> {
         }
     }
 
-    deleteByIteration(value: T): StatusCode {
+    private _clearRoot() {
+        this._root = null;
+    }
+
+    deleteByIteration(value: T): ActionStatusCode {
         const statusCode = this._deleteByIteration(value);
 
         if (statusCode === 0) {
@@ -224,104 +233,66 @@ export class BST<T extends any> {
         return statusCode;
     }
 
-    private _deleteByIteration(value: T): StatusCode {
+    private _deleteByIteration(value: T): ActionStatusCode {
         const targetNode = this.findNodeByIteration(value);
 
         if (targetNode === -1) {
             return STATUS_CODE.FAIL;
         }
 
-        const parentNode = targetNode.getParent();
-
-        if (parentNode === null) {
-            return STATUS_CODE.FAIL;
-        }
-
-        // 중복이 있는 경우
-        if (targetNode.isNotSingle()) {
-            targetNode.subtractExistCount();
-
-            return STATUS_CODE.SUCCESS;
-        }
-
         const leftNode = targetNode.getLeft();
         const rightNode = targetNode.getRight();
 
-        if (leftNode !== null) {
-            const largestValueNodeOfLeftSubTree = this.findLargestNodeByIteration(leftNode);
+        const parent = targetNode.getParent();
 
-            try {
-                if (largestValueNodeOfLeftSubTree === -1) {
-                    throw new Error("설계 미스. 왼쪽 자식이 있는데, 왼쪽 서브트리의 largest값이 없는건 불가능.");
-                }
+        if (leftNode === null && rightNode === null) {
+            // 제거 노드가 리프 노드인 경우
+            if (parent === null) {
+                // 제거 노드가 루트 노드인 경우
 
-                const parentNodeOfLargestValueNode = largestValueNodeOfLeftSubTree.getParent();
-
-                if (parentNodeOfLargestValueNode === null) {
-                    throw new Error("설계 미스. 왼쪽 자식의 부모가 없는건 불가능.");
-                }
-
-                if (largestValueNodeOfLeftSubTree === leftNode) {
-                    // 이 자식이 직계 자식인 경우
-                    parentNode.setLeft(largestValueNodeOfLeftSubTree);
-                    largestValueNodeOfLeftSubTree.setParent(parentNode);
+                this._clearRoot();
+            } else {
+                if (parent.getLeft() === targetNode) {
+                    parent.clearLeft();
                 } else {
-                    // 이 자식이 직계 자식이 아닌 경우
-
-                    parentNodeOfLargestValueNode.clearRight();
-                    parentNode.setLeft(largestValueNodeOfLeftSubTree);
-
-                    largestValueNodeOfLeftSubTree.setParent(parentNode);
-                    largestValueNodeOfLeftSubTree.setLeft(leftNode);
+                    parent.clearRight();
                 }
-                return STATUS_CODE.SUCCESS;
-            } catch (e) {
-                console.log(e);
-                return STATUS_CODE.FAIL;
             }
-        } else if (rightNode !== null) {
-            const smallestValueNodeOfRightSubTree = this.findSmallestNodeByIteration(rightNode);
-
-            try {
-                if (smallestValueNodeOfRightSubTree === -1) {
-                    throw new Error("설계 미스. 오른쪽 자식이 있는데, 오른쪽 서브트리의 smallest 없는건 불가능.");
-                }
-
-                const parentNodeOfSmallestValueNode = smallestValueNodeOfRightSubTree.getParent();
-
-                if (parentNodeOfSmallestValueNode === null) {
-                    throw new Error("설계 미스. 오른쪽 자식의 부모가 없는건 불가능.");
-                }
-
-                if (smallestValueNodeOfRightSubTree === rightNode) {
-                    // 이 자식이 직계 자식인 경우
-
-                    parentNode.setRight(smallestValueNodeOfRightSubTree);
-                    smallestValueNodeOfRightSubTree.setParent(parentNode);
+        } else if (leftNode !== null && rightNode === null) {
+            // 제거 노드가 왼쪽 자식만 갖고있는 경우
+            if (parent === null) {
+                this._setRoot(leftNode);
+            } else {
+                if (parent.getLeft() === targetNode) {
+                    parent.setLeft(leftNode);
                 } else {
-                    // 이 자식이 직계 자식이 아닌 경우
-
-                    parentNodeOfSmallestValueNode.clearLeft();
-                    parentNode.setRight(smallestValueNodeOfRightSubTree);
-
-                    smallestValueNodeOfRightSubTree.setParent(parentNode);
-                    smallestValueNodeOfRightSubTree.setRight(rightNode);
+                    parent.setRight(leftNode);
                 }
-                return STATUS_CODE.SUCCESS;
-            } catch (e) {
-                console.log(e);
-                return STATUS_CODE.FAIL;
+
+                leftNode.setParent(parent);
+            }
+        } else if (leftNode === null && rightNode !== null) {
+            // 제거 노드가 오른쪽 자식만 갖고있는 경우
+            if (parent === null) {
+                this._setRoot(rightNode);
+            } else {
+                if (parent.getLeft() === targetNode) {
+                    parent.setLeft(rightNode);
+                } else {
+                    parent.setRight(rightNode);
+                }
+
+                rightNode.setParent(parent);
             }
         } else {
-            parentNode.deleteChild(targetNode);
-
-            return STATUS_CODE.SUCCESS;
+            // 제거 노드가 양쪽 자식 다 갖고 있는 경우
+            const largestValueNodeOfLeftSubTree = this.findLargestNodeByIteration(leftNode);
         }
     }
 
     findLargestNodeByIteration(node: BSTNode<T>): FindStatusCode<BSTNode<T>> {
         if (node.isLeaf()) {
-            return STATUS_CODE.NOT_FOUND;
+            return node;
         }
 
         let parentNode = node;
@@ -341,7 +312,7 @@ export class BST<T extends any> {
 
     findSmallestNodeByIteration(node: BSTNode<T>): FindStatusCode<BSTNode<T>> {
         if (node.isLeaf()) {
-            return STATUS_CODE.NOT_FOUND;
+            return node;
         }
 
         let parentNode = node;
@@ -384,11 +355,15 @@ export class BST<T extends any> {
         return this._root;
     }
 
-    traverseInOrderByRecursion(): ActionHasResultStatusCode<T[]> {
+    private _setRoot(node: BSTNode<T>) {
+        this._root = node;
+    }
+
+    traverseInOrderByRecursion(): T[] {
         const rootNode = this.getRoot();
 
         if (rootNode === null) {
-            return STATUS_CODE.FAIL;
+            return [];
         }
 
         const result = [];
@@ -411,11 +386,11 @@ export class BST<T extends any> {
         }
     }
 
-    traversePostOrderByRecursion(): ActionHasResultStatusCode<T[]> {
+    traversePostOrderByRecursion(): T[] {
         const rootNode = this.getRoot();
 
         if (rootNode === null) {
-            return STATUS_CODE.FAIL;
+            return [];
         }
 
         const result = [];
@@ -438,11 +413,11 @@ export class BST<T extends any> {
         }
     }
 
-    traversePreOrderByRecursion(): ActionHasResultStatusCode<T[]> {
+    traversePreOrderByRecursion(): T[] {
         const rootNode = this.getRoot();
 
         if (rootNode === null) {
-            return STATUS_CODE.FAIL;
+            return [];
         }
 
         const result = [];
