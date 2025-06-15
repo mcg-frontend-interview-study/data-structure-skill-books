@@ -555,7 +555,9 @@ export class BST<T extends any> {
 
         let spaceString = SPACE.repeat(depth);
 
-        let log = `${spaceString}${directionString} ${JSON.stringify(parentNode.getValue())}`;
+        let log = `${spaceString}${directionString} ${JSON.stringify(parentNode.getValue())}${
+            parentNode.getExistCount() > 1 ? `(${parentNode.getExistCount()})` : ""
+        }`;
 
         logs.push(log);
 
