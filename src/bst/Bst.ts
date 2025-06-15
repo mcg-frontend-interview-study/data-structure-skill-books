@@ -13,7 +13,7 @@ import {
     StatusCode,
 } from "../constants/statusCode";
 import { BSTNode } from "./BstNode";
-import { Comparator, COMPARISION_RESULT } from "./utils/comparator";
+import { Comparator, COMPARISON_RESULT } from "./utils/comparator";
 
 // TODO: 생성자에 타입을 넣지 않으면 올바르게 사용하기 어려움
 export class BST<T extends any> {
