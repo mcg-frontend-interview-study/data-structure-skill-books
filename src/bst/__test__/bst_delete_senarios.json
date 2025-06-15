@@ -1,0 +1,981 @@
+[
+  {
+    "name": "존재하지 않는 값 삭제: 빈 트리",
+    "operations": [],
+    "deleteValue": 100,
+    "expectedStatusCode": 1,
+    "expectedInOrderTraversal": [],
+    "expectedSize": 0,
+    "expectedRoot": null
+  },
+  {
+    "name": "존재하지 않는 값 삭제: 비어있지 않은 트리",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      }
+    ],
+    "deleteValue": 100,
+    "expectedStatusCode": 1,
+    "expectedInOrderTraversal": [
+      30,
+      50,
+      70
+    ],
+    "expectedSize": 3,
+    "expectedRoot": 50
+  },
+  {
+    "name": "성공: 루트 노드 삭제 (단일 노드 트리)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 10
+      }
+    ],
+    "deleteValue": 10,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [],
+    "expectedSize": 0,
+    "expectedRoot": null
+  },
+  {
+    "name": "성공: 중복 노드 삭제 (카운트 감소)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 5
+      }
+    ],
+    "deleteValue": 10,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      5,
+      10
+    ],
+    "expectedSize": 2,
+    "expectedRoot": 10
+  },
+  {
+    "name": "성공: 리프 노드 삭제 (왼쪽 자식)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      }
+    ],
+    "deleteValue": 30,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      50,
+      70
+    ],
+    "expectedSize": 2,
+    "expectedRoot": 50
+  },
+  {
+    "name": "성공: 리프 노드 삭제 (오른쪽 자식)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      }
+    ],
+    "deleteValue": 70,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      30,
+      50
+    ],
+    "expectedSize": 2,
+    "expectedRoot": 50
+  },
+  {
+    "name": "성공: 루트 노드 삭제 (왼쪽 자식만 가진 경우, 대체 노드가 직계 왼쪽 자식)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 5
+      }
+    ],
+    "deleteValue": 10,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      5
+    ],
+    "expectedSize": 1,
+    "expectedRoot": 5
+  },
+  {
+    "name": "성공: 루트 노드 삭제 (오른쪽 자식만 가진 경우, 대체 노드가 직계 오른쪽 자식)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 15
+      }
+    ],
+    "deleteValue": 10,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      15
+    ],
+    "expectedSize": 1,
+    "expectedRoot": 15
+  },
+  {
+    "name": "성공: 루트 노드 삭제",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 5
+      },
+      {
+        "type": "insert",
+        "value": 7
+      },
+      {
+        "type": "insert",
+        "value": 3
+      },
+      {
+        "type": "insert",
+        "value": 6
+      }
+    ],
+    "deleteValue": 10,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      3,
+      5,
+      6,
+      7
+    ],
+    "expectedSize": 4,
+    "expectedRoot": 7
+  },
+  {
+    "name": "성공: 루트 노드 삭제 (오른쪽 자식만 가진 경우, 대체 노드가 직계 오른쪽 자식 아님)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 15
+      },
+      {
+        "type": "insert",
+        "value": 12
+      },
+      {
+        "type": "insert",
+        "value": 17
+      },
+      {
+        "type": "insert",
+        "value": 13
+      }
+    ],
+    "deleteValue": 10,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      12,
+      13,
+      15,
+      17
+    ],
+    "expectedSize": 4,
+    "expectedRoot": 12
+  },
+  {
+    "name": "성공: 양쪽 자식 노드 삭제 (왼쪽 서브트리에서 가장 큰 값으로 대체, 대체 노드가 직계 왼쪽 자식)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 20
+      },
+      {
+        "type": "insert",
+        "value": 40
+      }
+    ],
+    "deleteValue": 50,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      20,
+      30,
+      40,
+      70
+    ],
+    "expectedSize": 4,
+    "expectedRoot": 40
+  },
+  {
+    "name": "성공: 양쪽 자식 노드 삭제 ",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 20
+      },
+      {
+        "type": "insert",
+        "value": 40
+      },
+      {
+        "type": "insert",
+        "value": 35
+      },
+      {
+        "type": "insert",
+        "value": 45
+      }
+    ],
+    "deleteValue": 50,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      20,
+      30,
+      35,
+      40,
+      45,
+      70
+    ],
+    "expectedSize": 6,
+    "expectedRoot": 45
+  },
+  {
+    "name": "성공: 양쪽 자식 노드 삭제 ",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 60
+      },
+      {
+        "type": "insert",
+        "value": 80
+      }
+    ],
+    "deleteValue": 50,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      30,
+      60,
+      70,
+      80
+    ],
+    "expectedSize": 4,
+    "expectedRoot": 30
+  },
+  {
+    "name": "성공: 양쪽 자식 노드 삭제",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 60
+      },
+      {
+        "type": "insert",
+        "value": 80
+      },
+      {
+        "type": "insert",
+        "value": 65
+      },
+      {
+        "type": "insert",
+        "value": 75
+      }
+    ],
+    "deleteValue": 50,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      30,
+      60,
+      65,
+      70,
+      75,
+      80
+    ],
+    "expectedSize": 6,
+    "expectedRoot": 30
+  },
+  {
+    "name": "성공: 부모의 왼쪽 자식 노드 삭제 (왼쪽 자식만 있는 경우)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 150
+      },
+      {
+        "type": "insert",
+        "value": 25
+      },
+      {
+        "type": "insert",
+        "value": 75
+      }
+    ],
+    "deleteValue": 50,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      25,
+      75,
+      100,
+      150
+    ],
+    "expectedSize": 4,
+    "expectedRoot": 100
+  },
+  {
+    "name": "성공: 부모의 오른쪽 자식 노드 삭제 (오른쪽 자식만 있는 경우)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 150
+      },
+      {
+        "type": "insert",
+        "value": 125
+      },
+      {
+        "type": "insert",
+        "value": 175
+      }
+    ],
+    "deleteValue": 150,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      50,
+      100,
+      125,
+      175
+    ],
+    "expectedSize": 4,
+    "expectedRoot": 100
+  },
+  {
+    "name": "성공: 부모의 왼쪽 자식 노드 삭제 (양쪽 자식 있는 경우, 왼쪽 서브트리에서 대체)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 150
+      },
+      {
+        "type": "insert",
+        "value": 25
+      },
+      {
+        "type": "insert",
+        "value": 75
+      },
+      {
+        "type": "insert",
+        "value": 60
+      },
+      {
+        "type": "insert",
+        "value": 80
+      }
+    ],
+    "deleteValue": 50,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      25,
+      60,
+      75,
+      80,
+      100,
+      150
+    ],
+    "expectedSize": 6,
+    "expectedRoot": 100
+  },
+  {
+    "name": "성공: 부모의 오른쪽 자식 노드 삭제 (양쪽 자식 있는 경우, 왼쪽 서브트리에서 대체)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 150
+      },
+      {
+        "type": "insert",
+        "value": 125
+      },
+      {
+        "type": "insert",
+        "value": 175
+      },
+      {
+        "type": "insert",
+        "value": 110
+      },
+      {
+        "type": "insert",
+        "value": 140
+      }
+    ],
+    "deleteValue": 150,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      50,
+      100,
+      110,
+      125,
+      140,
+      175
+    ],
+    "expectedSize": 6,
+    "expectedRoot": 100
+  },
+  {
+    "name": "성공: 복잡한 트리에서 리프 노드 삭제",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 20
+      },
+      {
+        "type": "insert",
+        "value": 40
+      },
+      {
+        "type": "insert",
+        "value": 60
+      },
+      {
+        "type": "insert",
+        "value": 80
+      },
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 25
+      },
+      {
+        "type": "insert",
+        "value": 35
+      },
+      {
+        "type": "insert",
+        "value": 45
+      },
+      {
+        "type": "insert",
+        "value": 55
+      },
+      {
+        "type": "insert",
+        "value": 65
+      },
+      {
+        "type": "insert",
+        "value": 75
+      },
+      {
+        "type": "insert",
+        "value": 85
+      }
+    ],
+    "deleteValue": 10,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60,
+      65,
+      70,
+      75,
+      80,
+      85
+    ],
+    "expectedSize": 14,
+    "expectedRoot": 50
+  },
+  {
+    "name": "성공: 복잡한 트리에서 중간 노드 삭제 (왼쪽 서브트리에서 대체)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 20
+      },
+      {
+        "type": "insert",
+        "value": 40
+      },
+      {
+        "type": "insert",
+        "value": 60
+      },
+      {
+        "type": "insert",
+        "value": 80
+      },
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 25
+      },
+      {
+        "type": "insert",
+        "value": 35
+      },
+      {
+        "type": "insert",
+        "value": 45
+      },
+      {
+        "type": "insert",
+        "value": 55
+      },
+      {
+        "type": "insert",
+        "value": 65
+      },
+      {
+        "type": "insert",
+        "value": 75
+      },
+      {
+        "type": "insert",
+        "value": 85
+      }
+    ],
+    "deleteValue": 70,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      10,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60,
+      65,
+      75,
+      80,
+      85
+    ],
+    "expectedSize": 14,
+    "expectedRoot": 50
+  },
+  {
+    "name": "성공: 복잡한 트리에서 중간 노드 삭제 (오른쪽 서브트리에서 대체)",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 50
+      },
+      {
+        "type": "insert",
+        "value": 30
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 20
+      },
+      {
+        "type": "insert",
+        "value": 40
+      },
+      {
+        "type": "insert",
+        "value": 60
+      },
+      {
+        "type": "insert",
+        "value": 80
+      },
+      {
+        "type": "insert",
+        "value": 10
+      },
+      {
+        "type": "insert",
+        "value": 25
+      },
+      {
+        "type": "insert",
+        "value": 35
+      },
+      {
+        "type": "insert",
+        "value": 45
+      },
+      {
+        "type": "insert",
+        "value": 55
+      },
+      {
+        "type": "insert",
+        "value": 65
+      },
+      {
+        "type": "insert",
+        "value": 75
+      },
+      {
+        "type": "insert",
+        "value": 85
+      }
+    ],
+    "deleteValue": 30,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      10,
+      20,
+      25,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60,
+      65,
+      70,
+      75,
+      80,
+      85
+    ],
+    "expectedSize": 14,
+    "expectedRoot": 50
+  },
+  {
+    "name": "left 노드가 없는 노드를 제거하는 경우 && 직계 자식이 대체 노드인 경우 && 제거 노드가 루트 노드가 아닌 경우 && 제거 노드가 부모의 왼쪽인 경우",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 80
+      }
+    ],
+    "deleteValue": 70,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      80,
+      100
+    ],
+    "expectedSize": 2,
+    "expectedRoot": 100
+  },
+  {
+    "name": "left 노드가 없는 노드를 제거하는 경우 && 직계 자식이 대체 노드인 경우 && 제거 노드가 루트 노드가 아닌 경우 && 제거 노드가 부모의 왼쪽인 경우",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 70
+      },
+      {
+        "type": "insert",
+        "value": 80
+      }
+    ],
+    "deleteValue": 70,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      80,
+      100
+    ],
+    "expectedSize": 2,
+    "expectedRoot": 100
+  },
+  {
+    "name": "left 노드가 없는 노드를 제거하는 경우 && 직계 자식이 대체 노드인 경우 && 제거 노드가 루트 노드가 아닌 경우 && 제거 노드가 부모의 오른쪽인 경우",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 120
+      },
+      {
+        "type": "insert",
+        "value": 140
+      }
+    ],
+    "deleteValue": 120,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      100,
+      140
+    ],
+    "expectedSize": 2,
+    "expectedRoot": 100
+  },
+  {
+    "name": "adsf",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 80
+      },
+      {
+        "type": "insert",
+        "value": 90
+      },
+      {
+        "type": "insert",
+        "value": 85
+      },
+      {
+        "type": "insert",
+        "value": 95
+      },
+      {
+        "type": "insert",
+        "value": 87
+      }
+    ],
+    "deleteValue": 80,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      85,
+      87,
+      90,
+      95,
+      100
+    ],
+    "expectedSize": 5,
+    "expectedRoot": 100
+  },
+  {
+    "name": "asdfasdf",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 120
+      },
+      {
+        "type": "insert",
+        "value": 140
+      },
+      {
+        "type": "insert",
+        "value": 130
+      },
+      {
+        "type": "insert",
+        "value": 135
+      }
+    ],
+    "deleteValue": 120,
+    "expectedStatusCode": 0,
+    "expectedInOrderTraversal": [
+      100,
+      130,
+      135,
+      140
+    ],
+    "expectedSize": 4,
+    "expectedRoot": 100
+  },
+  {
+    "name": "하나만 있음",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 120
+      }
+    ],
+    "deleteValue": 120,
+    "expectedStatusCode": 0,
+    "expectedRoot": 100,
+    "expectedInOrderTraversal": [
+      100
+    ],
+    "expectedSize": 1
+  }
+]
