@@ -5,13 +5,7 @@
  * "없다", "찾을 수 없다" 는 엄격히 다르다. 전자는 null, 후자는 -1
  */
 
-import {
-    ActionHasResultStatusCode,
-    ActionStatusCode,
-    FindStatusCode,
-    STATUS_CODE,
-    StatusCode,
-} from "../constants/statusCode";
+import { ActionStatusCode, FindStatusCode, STATUS_CODE } from "../constants/statusCode";
 import { BSTNode } from "./BstNode";
 import { Comparator, COMPARISON_RESULT } from "./utils/comparator";
 
@@ -30,6 +24,10 @@ export class BST<T extends any> {
 
     private _getComparator() {
         return this._comparator;
+    }
+
+    insert(value: T) {
+        this.insertByIteration(value);
     }
 
     insertByRecursion(value: T) {
@@ -51,11 +49,11 @@ export class BST<T extends any> {
         const comparisionResult = comparator(newNode.getValue(), parentNode.getValue());
 
         switch (comparisionResult) {
-            case COMPARISION_RESULT.EQUAL:
+            case COMPARISON_RESULT.EQUAL:
                 parentNode.addExistCount();
                 break;
 
-            case COMPARISION_RESULT.GREATER_THAN:
+            case COMPARISON_RESULT.GREATER_THAN:
                 const rightNode = parentNode.getRight();
 
                 if (rightNode === null) {
@@ -66,7 +64,7 @@ export class BST<T extends any> {
                 }
                 break;
 
-            case COMPARISION_RESULT.LESS_THAN:
+            case COMPARISON_RESULT.LESS_THAN:
                 const leftNode = parentNode.getLeft();
 
                 if (leftNode === null) {
@@ -97,12 +95,12 @@ export class BST<T extends any> {
                 const comparisionResult = comparator(value, parentNode.getValue());
 
                 switch (comparisionResult) {
-                    case COMPARISION_RESULT.EQUAL:
+                    case COMPARISON_RESULT.EQUAL:
                         parentNode.addExistCount();
                         stopFlag = true;
                         break;
 
-                    case COMPARISION_RESULT.GREATER_THAN:
+                    case COMPARISON_RESULT.GREATER_THAN:
                         const rightNode = parentNode.getRight();
 
                         // 새 값이 더 큰 경우
@@ -119,7 +117,7 @@ export class BST<T extends any> {
                             break;
                         }
 
-                    case COMPARISION_RESULT.LESS_THAN:
+                    case COMPARISON_RESULT.LESS_THAN:
                         const leftNode = parentNode.getLeft();
 
                         // 새 값이 더 작은 경우
@@ -147,6 +145,10 @@ export class BST<T extends any> {
         this._addSize();
     }
 
+    find(value: T): FindStatusCode<BSTNode<T>> {
+        return this.findNodeByIteration(value);
+    }
+
     findNodeByIteration(value: T): FindStatusCode<BSTNode<T>> {
         let rootNode = this.getRoot();
 
@@ -160,10 +162,10 @@ export class BST<T extends any> {
                 const comparisionResult = comparator(value, parentNode.getValue());
 
                 switch (comparisionResult) {
-                    case COMPARISION_RESULT.EQUAL:
+                    case COMPARISON_RESULT.EQUAL:
                         return parentNode;
 
-                    case COMPARISION_RESULT.GREATER_THAN:
+                    case COMPARISON_RESULT.GREATER_THAN:
                         const rightNode = parentNode.getRight();
 
                         if (rightNode === null) {
@@ -173,7 +175,7 @@ export class BST<T extends any> {
                             continue;
                         }
 
-                    case COMPARISION_RESULT.LESS_THAN:
+                    case COMPARISON_RESULT.LESS_THAN:
                         const leftNode = parentNode.getLeft();
 
                         if (leftNode === null) {
@@ -194,33 +196,42 @@ export class BST<T extends any> {
             return STATUS_CODE.NOT_FOUND;
         }
 
-        return this._fingNodeByRecuesion(rootNode, value);
+        return this._findNodeByRecursion(rootNode, value);
     }
 
-    private _fingNodeByRecuesion(parentNode: BSTNode<T>, value: T): FindStatusCode<BSTNode<T>> {
-        const parentValue = parentNode.getValue();
+    private _findNodeByRecursion(parentNode: BSTNode<T>, value: T): FindStatusCode<BSTNode<T>> {
+        const comparetor = this._getComparator();
 
-        if (parentValue === value) {
-            return parentNode;
-        } else if (parentValue < value) {
-            const rightNode = parentNode.getRight();
-            if (rightNode === null) {
-                return STATUS_CODE.NOT_FOUND;
-            } else {
-                return this._fingNodeByRecuesion(rightNode, value);
-            }
-        } else {
-            const leftNode = parentNode.getLeft();
-            if (leftNode === null) {
-                return STATUS_CODE.NOT_FOUND;
-            } else {
-                return this._fingNodeByRecuesion(leftNode, value);
-            }
+        const comparisonResult = comparetor(value, parentNode.getValue());
+
+        switch (comparisonResult) {
+            case COMPARISON_RESULT.EQUAL:
+                return parentNode;
+
+            case COMPARISON_RESULT.GREATER_THAN:
+                const rightNode = parentNode.getRight();
+                if (rightNode === null) {
+                    return STATUS_CODE.NOT_FOUND;
+                } else {
+                    return this._findNodeByRecursion(rightNode, value);
+                }
+
+            case COMPARISON_RESULT.LESS_THAN:
+                const leftNode = parentNode.getLeft();
+                if (leftNode === null) {
+                    return STATUS_CODE.NOT_FOUND;
+                } else {
+                    return this._findNodeByRecursion(leftNode, value);
+                }
         }
     }
 
     private _clearRoot() {
         this._root = null;
+    }
+
+    delete(value: T): ActionStatusCode {
+        return this.deleteByIteration(value);
     }
 
     deleteByIteration(value: T): ActionStatusCode {
@@ -237,60 +248,138 @@ export class BST<T extends any> {
         const targetNode = this.findNodeByIteration(value);
 
         if (targetNode === -1) {
+            // 해당하는 노드가 트리에 없는 경우
             return STATUS_CODE.FAIL;
         }
 
-        const leftNode = targetNode.getLeft();
-        const rightNode = targetNode.getRight();
+        if (targetNode.getExistCount() >= 2) {
+            targetNode.subtractExistCount();
 
-        const parent = targetNode.getParent();
+            return STATUS_CODE.SUCCESS;
+        }
 
-        if (leftNode === null && rightNode === null) {
+        const leftChild = targetNode.getLeft();
+        const rightChild = targetNode.getRight();
+
+        const parentNode = targetNode.getParent();
+
+        if (leftChild === null && rightChild === null) {
             // 제거 노드가 리프 노드인 경우
-            if (parent === null) {
+            if (parentNode === null) {
                 // 제거 노드가 루트 노드인 경우
-
                 this._clearRoot();
             } else {
-                if (parent.getLeft() === targetNode) {
-                    parent.clearLeft();
+                if (parentNode.getLeft() === targetNode) {
+                    parentNode.clearLeft();
                 } else {
-                    parent.clearRight();
+                    parentNode.clearRight();
                 }
             }
-        } else if (leftNode !== null && rightNode === null) {
-            // 제거 노드가 왼쪽 자식만 갖고있는 경우
-            if (parent === null) {
-                this._setRoot(leftNode);
-            } else {
-                if (parent.getLeft() === targetNode) {
-                    parent.setLeft(leftNode);
-                } else {
-                    parent.setRight(leftNode);
-                }
+        } else if (leftChild !== null && rightChild !== null) {
+            const LN = this.findLargestNodeByIteration(leftChild);
 
-                leftNode.setParent(parent);
+            const child = LN.getLeft();
+
+            if (child) {
+                const parent = LN.getParent();
+
+                if (parent) {
+                    if (parent.getLeft() === LN) {
+                        parent.setLeft(child);
+                        child.setParent(parent);
+                    } else if (parent.getRight() === LN) {
+                        parent.setRight(child);
+                        child.setParent(parent);
+                    }
+
+                    LN.clearLeft();
+                    LN.clearParent();
+                }
             }
-        } else if (leftNode === null && rightNode !== null) {
-            // 제거 노드가 오른쪽 자식만 갖고있는 경우
-            if (parent === null) {
-                this._setRoot(rightNode);
-            } else {
-                if (parent.getLeft() === targetNode) {
-                    parent.setLeft(rightNode);
-                } else {
-                    parent.setRight(rightNode);
+
+            const parent = LN.getParent();
+
+            if (parent) {
+                parent.clearRight();
+                LN.clearParent();
+            }
+
+            const parentNode = targetNode.getParent();
+
+            if (parentNode === null) {
+                this._setRoot(LN);
+                LN.clearParent();
+
+                const l = targetNode.getLeft();
+                if (l && l !== LN) {
+                    LN.setLeft(l);
+                    l.setParent(LN);
                 }
 
-                rightNode.setParent(parent);
+                LN.setRight(rightChild);
+                rightChild.setParent(LN);
+            } else {
+                if (parentNode.getLeft() === targetNode) {
+                    parentNode.setLeft(LN);
+                    LN.setParent(parentNode);
+
+                    LN.setRight(rightChild);
+                    rightChild.setParent(LN);
+
+                    const l = targetNode.getLeft();
+                    if (l && l !== LN) {
+                        LN.setLeft(l);
+                        l.setParent(LN);
+                    }
+                } else if (parentNode.getRight() === targetNode) {
+                    parentNode.setRight(LN);
+                    LN.setParent(parentNode);
+
+                    const l = targetNode.getLeft();
+                    if (l && l !== LN) {
+                        LN.setLeft(l);
+                        l.setParent(LN);
+                    }
+                    LN.setRight(rightChild);
+                    rightChild.setParent(LN);
+                }
             }
         } else {
-            // 제거 노드가 양쪽 자식 다 갖고 있는 경우
-            const largestValueNodeOfLeftSubTree = this.findLargestNodeByIteration(leftNode);
+            if (leftChild !== null) {
+                if (parentNode === null) {
+                    // 제거 노드가 한쪽 자식만 있는 경우
+                    leftChild.clearParent();
+                    this._setRoot(leftChild);
+                } else {
+                    if (parentNode.getLeft() === targetNode) {
+                        parentNode.setLeft(leftChild);
+                        leftChild.setParent(parentNode);
+                    } else if (parentNode.getRight() === targetNode) {
+                        parentNode.setRight(leftChild);
+                        leftChild.setParent(parentNode);
+                    }
+                }
+            } else if (rightChild !== null) {
+                if (parentNode === null) {
+                    // 제거 노드가 한쪽 자식만 있는 경우
+                    rightChild.clearParent();
+                    this._setRoot(rightChild);
+                } else {
+                    if (parentNode.getLeft() === targetNode) {
+                        parentNode.setLeft(rightChild);
+                        rightChild.setParent(parentNode);
+                    } else if (parentNode.getRight() === targetNode) {
+                        parentNode.setRight(rightChild);
+                        rightChild.setParent(parentNode);
+                    }
+                }
+            }
         }
+
+        return STATUS_CODE.SUCCESS;
     }
 
-    findLargestNodeByIteration(node: BSTNode<T>): FindStatusCode<BSTNode<T>> {
+    findLargestNodeByIteration(node: BSTNode<T>): BSTNode<T> {
         if (node.isLeaf()) {
             return node;
         }
@@ -310,30 +399,6 @@ export class BST<T extends any> {
         }
     }
 
-    findSmallestNodeByIteration(node: BSTNode<T>): FindStatusCode<BSTNode<T>> {
-        if (node.isLeaf()) {
-            return node;
-        }
-
-        let parentNode = node;
-
-        while (true) {
-            const leftNode = parentNode.getLeft();
-
-            if (leftNode === null) {
-                return parentNode;
-            } else {
-                parentNode = leftNode;
-
-                continue;
-            }
-        }
-    }
-
-    isEmpty() {
-        return this._size === 0;
-    }
-
     getSize() {
         return this._size;
     }
@@ -342,13 +407,8 @@ export class BST<T extends any> {
         this._size += 1;
     }
 
-    private _subtractSize(): ActionStatusCode {
-        if (this.isEmpty()) {
-            return STATUS_CODE.FAIL;
-        }
-
+    private _subtractSize() {
         this._size -= 1;
-        return STATUS_CODE.SUCCESS;
     }
 
     getRoot() {
@@ -386,33 +446,6 @@ export class BST<T extends any> {
         }
     }
 
-    traversePostOrderByRecursion(): T[] {
-        const rootNode = this.getRoot();
-
-        if (rootNode === null) {
-            return [];
-        }
-
-        const result = [];
-        this._traversePostOrderByRecursion(rootNode, result);
-
-        return result;
-    }
-
-    private _traversePostOrderByRecursion(parentNode: BSTNode<T>, result: T[]) {
-        result.push(parentNode.getValue());
-
-        const leftNode = parentNode.getLeft();
-        if (leftNode) {
-            this._traverseInOrderByRecursion(leftNode, result);
-        }
-
-        const rightNode = parentNode.getRight();
-        if (rightNode) {
-            this._traverseInOrderByRecursion(rightNode, result);
-        }
-    }
-
     traversePreOrderByRecursion(): T[] {
         const rootNode = this.getRoot();
 
@@ -427,42 +460,72 @@ export class BST<T extends any> {
     }
 
     private _traversePreOrderByRecursion(parentNode: BSTNode<T>, result: T[]) {
+        result.push(parentNode.getValue());
+
         const leftNode = parentNode.getLeft();
         if (leftNode) {
-            this._traverseInOrderByRecursion(leftNode, result);
+            this._traversePreOrderByRecursion(leftNode, result);
         }
 
         const rightNode = parentNode.getRight();
         if (rightNode) {
-            this._traverseInOrderByRecursion(rightNode, result);
+            this._traversePreOrderByRecursion(rightNode, result);
+        }
+    }
+
+    traversePostOrderByRecursion(): T[] {
+        const rootNode = this.getRoot();
+
+        if (rootNode === null) {
+            return [];
+        }
+
+        const result = [];
+        this._traversePostOrderByRecursion(rootNode, result);
+
+        return result;
+    }
+
+    private _traversePostOrderByRecursion(parentNode: BSTNode<T>, result: T[]) {
+        const leftNode = parentNode.getLeft();
+        if (leftNode) {
+            this._traversePostOrderByRecursion(leftNode, result);
+        }
+
+        const rightNode = parentNode.getRight();
+        if (rightNode) {
+            this._traversePostOrderByRecursion(rightNode, result);
         }
 
         result.push(parentNode.getValue());
     }
 
-    printTreeByIteration(rootValue?: T): ActionStatusCode {
-        let rootNode = rootValue ? this.findNodeByIteration(rootValue) : this.getRoot();
+    /* istanbul ignore next */
+    printTreeByIteration(rootValue?: T, printFn?: (res: string) => void): ActionStatusCode {
+        if (this.getSize() === 0) {
+            console.log("empty tree");
+            return STATUS_CODE.SUCCESS;
+        }
 
+        let rootNode = rootValue ? this.findNodeByIteration(rootValue) : this.getRoot();
         if (rootNode === null || rootNode === STATUS_CODE.NOT_FOUND) {
             return STATUS_CODE.FAIL;
         }
 
-        /**
-         * right -> parent -> left순으로 반시계 회전한 모습을 출력한다.( 반시계 회전은 출력 용이를 위해..)
-         * 들여쓰기 깊이로 출력한다.
-         *
-         * traversePrint할 때 깊이를 넣는다. +1해서
-         * 그러면 print할 때 깊이값 * 공백 + ㄴ 같은걸 넣어서 숫자를 출력한다.
-         */
-
         const logs: string[] = [];
 
         this._traverseForPrint(rootNode, 0, "center", logs);
-        console.log(logs.join("\n"));
+
+        if (printFn) {
+            printFn(logs.join("\n"));
+        } else {
+            console.log(logs.join("\n"));
+        }
 
         return STATUS_CODE.SUCCESS;
     }
 
+    /* istanbul ignore next */
     private _traverseForPrint(
         parentNode: BSTNode<T>,
         depth: number,
@@ -472,6 +535,7 @@ export class BST<T extends any> {
         const SPACE = "    ";
 
         const rightNode = parentNode.getRight();
+
         if (rightNode) {
             this._traverseForPrint(rightNode, depth + 1, "right", logs);
         }
@@ -491,7 +555,7 @@ export class BST<T extends any> {
 
         let spaceString = SPACE.repeat(depth);
 
-        let log = `${spaceString}${directionString} ${parentNode.getValue()}`;
+        let log = `${spaceString}${directionString} ${JSON.stringify(parentNode.getValue())}`;
 
         logs.push(log);
 
