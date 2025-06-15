@@ -1,6 +1,6 @@
 import { BST } from "../Bst";
 import { defaultNumberComparator } from "../utils/comparator";
-import testCases from "./bst_delete_senarios.json";
+import testCases from "./bst_delete_test_cases.json";
 
 describe("BinarySearchTree - _delete", () => {
     let tree: BST<number>;
@@ -20,9 +20,9 @@ describe("BinarySearchTree - _delete", () => {
             expectedSize,
             expectedRoot,
         }) => {
-            operations.forEach((op: { type: string; value: number }) => {
-                if (op.type === "insert") {
-                    tree.insertByIteration(op.value);
+            operations.forEach(({ operation, value }) => {
+                if (operation === "insert") {
+                    tree.insertByIteration(value);
                 }
             });
 

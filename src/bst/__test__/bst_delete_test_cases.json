@@ -1,0 +1,531 @@
+[
+    {
+        "name": "비어있는 트리",
+        "operations": [],
+        "deleteValue": 10,
+        "expectedStatusCode": 1,
+        "expectedInOrderTraversal": [],
+        "expectedSize": 0,
+        "expectedRoot": null
+    },
+    {
+        "name": "루트만 있는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 10
+            }
+        ],
+        "deleteValue": 10,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [],
+        "expectedSize": 0,
+        "expectedRoot": null
+    },
+    {
+        "name": "왼쪽 자식(리프노드)만 있는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            }
+        ],
+        "deleteValue": 10,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            20
+        ],
+        "expectedSize": 1,
+        "expectedRoot": 20
+    },
+    {
+        "name": "왼쪽 자식(서브트리)만 있는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 5
+            }
+        ],
+        "deleteValue": 20,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            5,
+            10,
+            30
+        ],
+        "expectedSize": 3,
+        "expectedRoot": 30
+    },
+    {
+        "name": "오른쪽 자식(리프노드)만 있는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            }
+        ],
+        "deleteValue": 20,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10
+        ],
+        "expectedSize": 1,
+        "expectedRoot": 10
+    },
+    {
+        "name": "오른쪽 자식(서브트리)만 있는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            }
+        ],
+        "deleteValue": 20,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            30,
+            40
+        ],
+        "expectedSize": 3,
+        "expectedRoot": 10
+    },
+    {
+        "name": "양쪽 자식이 있는 루트 노드 삭제",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            }
+        ],
+        "deleteValue": 20,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            30
+        ],
+        "expectedSize": 2,
+        "expectedRoot": 10
+    },
+    {
+        "name": "양쪽 자식이 있는 not 루트 노드 삭제",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            }
+        ],
+        "deleteValue": 20,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            25,
+            30,
+            40
+        ],
+        "expectedSize": 4,
+        "expectedRoot": 30
+    },
+    {
+        "name": "양쪽 자식이 있으며 대체 노드가 left가 아닌 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            }
+        ],
+        "deleteValue": 30,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            20,
+            25,
+            40
+        ],
+        "expectedSize": 4,
+        "expectedRoot": 25
+    },
+    {
+        "name": "양쪽 자식이 있으며 대체 노드가 left가 아니며 대체 노드의 왼쪽 서브트리가 있는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            },
+            {
+                "operation": "insert",
+                "value": 27
+            }
+        ],
+        "deleteValue": 30,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            20,
+            25,
+            27,
+            40
+        ],
+        "expectedSize": 5,
+        "expectedRoot": 27
+    },
+    {
+        "name": "양쪽 자식이 있으며 대체 노드가 left가 아니며 대체 노드의 왼쪽 서브트리가 없는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            },
+            {
+                "operation": "insert",
+                "value": 28
+            }
+        ],
+        "deleteValue": 30,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            20,
+            25,
+            28,
+            40
+        ],
+        "expectedSize": 5,
+        "expectedRoot": 28
+    },
+    {
+        "name": "삭제할 값이 없는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            }
+        ],
+        "deleteValue": 40,
+        "expectedStatusCode": 1,
+        "expectedInOrderTraversal": [
+            10,
+            20,
+            30
+        ],
+        "expectedSize": 3,
+        "expectedRoot": 20
+    },
+    {
+        "name": "삭제할 값이 중복된 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            }
+        ],
+        "deleteValue": 20,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            20,
+            30
+        ],
+        "expectedSize": 3,
+        "expectedRoot": 20
+    },
+    {
+        "name": "루트가 아닌 왼쪽 삭제 노드의 left를 계승하는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 35
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            }
+        ],
+        "deleteValue": 30,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            20,
+            25,
+            35,
+            40
+        ],
+        "expectedSize": 5,
+        "expectedRoot": 40
+    },
+    {
+        "name": "루트가 아닌 오른쪽 삭제 노드의 right를 계승하는 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 35
+            },
+            {
+                "operation": "insert",
+                "value": 23
+            },
+            {
+                "operation": "insert",
+                "value": 21
+            },
+            {
+                "operation": "insert",
+                "value": 24
+            }
+        ],
+        "deleteValue": 30,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            10,
+            20,
+            21,
+            23,
+            24,
+            25,
+            35,
+            40
+        ],
+        "expectedSize": 8,
+        "expectedRoot": 20
+    },
+    {
+        "name": "왼쪽 자식만 있으면서 삭제할 노드가 루트인 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 5
+            }
+        ],
+        "deleteValue": 20,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            5,
+            10
+        ],
+        "expectedSize": 2,
+        "expectedRoot": 10
+    },
+    {
+        "name": "오른쪽 자식만 있으면서 삭제할 노드가 루트인 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            }
+        ],
+        "deleteValue": 10,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            20,
+            30
+        ],
+        "expectedSize": 2,
+        "expectedRoot": 20
+    },
+    {
+        "name": "오른쪽 자식만 있으면서 삭제 노드가 루트가 아니며 왼쪽에 위치한 트리",
+        "operations": [
+            {
+                "operation": "insert",
+                "value": 50
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 45
+            }
+        ],
+        "deleteValue": 30,
+        "expectedStatusCode": 0,
+        "expectedInOrderTraversal": [
+            40,
+            45,
+            50
+        ],
+        "expectedSize": 3,
+        "expectedRoot": 50
+    }
+]
