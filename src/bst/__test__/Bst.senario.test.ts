@@ -2,16 +2,15 @@ import { BST } from "../Bst";
 import { defaultNumberComparator } from "../utils/comparator";
 import testCases from "./bst_delete_senarios.json";
 
-describe("BinarySearchTree - _deleteByIteration (타입 안전성 강화 테스트)", () => {
+describe("BinarySearchTree - _delete", () => {
     let tree: BST<number>;
 
     beforeEach(() => {
-        // 매 테스트 케이스마다 새로운 트리 인스턴스 생성
         tree = new BST<number>(defaultNumberComparator);
     });
 
     test.each(testCases)(
-        "시나리오: %s", // JSON의 name 필드를 테스트 이름으로 사용
+        "시나리오: %s",
         ({
             name,
             operations,
@@ -21,31 +20,46 @@ describe("BinarySearchTree - _deleteByIteration (타입 안전성 강화 테스�
             expectedSize,
             expectedRoot,
         }) => {
-            // 초기 트리 상태 설정
             operations.forEach((op: { type: string; value: number }) => {
                 if (op.type === "insert") {
                     tree.insertByIteration(op.value);
                 }
             });
 
-            // _deleteByIteration 메서드 호출
-            // TestableBinarySearchTree 인터페이스 덕분에 타입 오류 없이 _deleteByIteration에 접근 가능
             const result = tree.deleteByIteration(deleteValue);
 
-            // 예상 결과 검증
+            const isResultCorrect = result === expectedStatusCode;
+            const isSizeCorrect = tree.getSize() === expectedSize;
+            const isRootCorrect =
+                expectedRoot === null ? tree.getRoot() === null : tree.getRoot()?.getValue() === expectedRoot;
+            const actualInOrderTraversal = tree.traverseInOrderByRecursion();
+            const isInOrderCorrect =
+                JSON.stringify(actualInOrderTraversal) === JSON.stringify(expectedInOrderTraversal);
+
+            if (!isResultCorrect || !isSizeCorrect || !isRootCorrect || !isInOrderCorrect) {
+                console.log(`\n--- 실패한 테스트 케이스 정보 ---`);
+                console.log(`시나리오 이름: ${name}`);
+                console.log(`삭제 값: ${deleteValue}`);
+                console.log(`예상 상태 코드: ${expectedStatusCode}, 실제 상태 코드: ${result}`);
+                console.log(`예상 사이즈: ${expectedSize}, 실제 사이즈: ${tree.getSize()}`);
+                console.log(`예상 루트: ${expectedRoot}, 실제 루트: ${tree.getRoot()?.getValue()}`);
+                tree.printTreeByIteration();
+                console.log(
+                    `예상 중위 순회: [${expectedInOrderTraversal}], 실제 중위 순회: [${actualInOrderTraversal}]`
+                );
+                tree.printTreeByIteration();
+                console.log(`------------------------------`);
+            }
+
             expect(result).toBe(expectedStatusCode);
             expect(tree.getSize()).toBe(expectedSize);
 
-            // 루트 노드 값 검증
             if (expectedRoot === null) {
                 expect(tree.getRoot()).toBeNull();
             } else {
                 expect(tree.getRoot()?.getValue()).toBe(expectedRoot);
             }
 
-            // 중위 순회 결과 검증
-            // inOrderTraversal() 메서드가 BinarySearchTree에 구현되어 있다고 가정
-            const actualInOrderTraversal = tree.traverseInOrderByRecursion();
             expect(actualInOrderTraversal).toEqual(expectedInOrderTraversal);
         }
     );
