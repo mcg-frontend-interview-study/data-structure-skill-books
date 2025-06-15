@@ -196,7 +196,7 @@
       7
     ],
     "expectedSize": 4,
-    "expectedRoot": 7
+    "expectedRoot": 5
   },
   {
     "name": "성공: 루트 노드 삭제 (오른쪽 자식만 가진 경우, 대체 노드가 직계 오른쪽 자식 아님)",
@@ -231,7 +231,7 @@
       17
     ],
     "expectedSize": 4,
-    "expectedRoot": 12
+    "expectedRoot": 15
   },
   {
     "name": "성공: 양쪽 자식 노드 삭제 (왼쪽 서브트리에서 가장 큰 값으로 대체, 대체 노드가 직계 왼쪽 자식)",
@@ -977,5 +977,60 @@
       100
     ],
     "expectedSize": 1
+  },
+  {
+    "name": "왼쪽만 있으면서 부모의 왼쪽이면서 부모가 루트가 아닌 경우",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 80
+      },
+      {
+        "type": "insert",
+        "value": 60
+      }
+    ],
+    "deleteValue": 80,
+    "expectedStatusCode": 0,
+    "expectedRoot": 100,
+    "expectedInOrderTraversal": [
+      60,
+      100
+    ],
+    "expectedSize": 2
+  },
+  {
+    "name": "왼쪽만 있으면서 부모의 왼쪽이면서 부모가 루트가 아닌 경우2",
+    "operations": [
+      {
+        "type": "insert",
+        "value": 100
+      },
+      {
+        "type": "insert",
+        "value": 80
+      },
+      {
+        "type": "insert",
+        "value": 60
+      },
+      {
+        "type": "insert",
+        "value": 40
+      }
+    ],
+    "deleteValue": 80,
+    "expectedStatusCode": 0,
+    "expectedRoot": 100,
+    "expectedInOrderTraversal": [
+      40,
+      60,
+      100
+    ],
+    "expectedSize": 3
   }
 ]
