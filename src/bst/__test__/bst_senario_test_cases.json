@@ -1,0 +1,718 @@
+[
+    {
+        "name": "기본 삽입, 탐색, 삭제 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 50
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 70
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 60
+            },
+            {
+                "operation": "insert",
+                "value": 80
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            },
+            {
+                "operation": "insert",
+                "value": 75
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 45
+            },
+            {
+                "operation": "insert",
+                "value": 65
+            },
+            {
+                "operation": "insert",
+                "value": 85
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            }
+        ],
+        "testSteps": [
+            {
+                "description": "초기 삽입 후 상태 확인",
+                "assertions": [
+                    {
+                        "type": "size",
+                        "expected": 14
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            10,
+                            20,
+                            25,
+                            30,
+                            40,
+                            45,
+                            50,
+                            60,
+                            65,
+                            70,
+                            75,
+                            80,
+                            85
+                        ]
+                    }
+                ]
+            },
+            {
+                "description": "50 탐색",
+                "operation": {
+                    "type": "find",
+                    "value": 50
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "nodeValue",
+                        "value": 50,
+                        "expected": 50
+                    }
+                ]
+            },
+            {
+                "description": "30 탐색 (existCount 확인)",
+                "operation": {
+                    "type": "find",
+                    "value": 30
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "nodeValue",
+                        "value": 30,
+                        "expected": 30
+                    },
+                    {
+                        "type": "existCount",
+                        "value": 30,
+                        "expected": 2
+                    }
+                ]
+            },
+            {
+                "description": "없는 값(99) 탐색",
+                "operation": {
+                    "type": "find",
+                    "value": 99
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": -1
+                    }
+                ]
+            },
+            {
+                "description": "10 삭제 (리프 노드)",
+                "operation": {
+                    "type": "delete",
+                    "value": 10
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 13
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            20,
+                            25,
+                            30,
+                            40,
+                            45,
+                            50,
+                            60,
+                            65,
+                            70,
+                            75,
+                            80,
+                            85
+                        ]
+                    },
+                    {
+                        "type": "find",
+                        "value": 10,
+                        "expected": -1
+                    }
+                ]
+            },
+            {
+                "description": "30 삭제 (existCount 있는 노드)",
+                "operation": {
+                    "type": "delete",
+                    "value": 30
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 12
+                    },
+                    {
+                        "type": "existCount",
+                        "value": 30,
+                        "expected": 1
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            20,
+                            25,
+                            30,
+                            40,
+                            45,
+                            50,
+                            60,
+                            65,
+                            70,
+                            75,
+                            80,
+                            85
+                        ]
+                    }
+                ]
+            },
+            {
+                "description": "60 삭제 (한쪽 자식만 있는 노드)",
+                "operation": {
+                    "type": "delete",
+                    "value": 60
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 11
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            20,
+                            25,
+                            30,
+                            40,
+                            45,
+                            50,
+                            65,
+                            70,
+                            75,
+                            80,
+                            85
+                        ]
+                    },
+                    {
+                        "type": "find",
+                        "value": 60,
+                        "expected": -1
+                    },
+                    {
+                        "type": "find",
+                        "value": 65,
+                        "expected": "node"
+                    }
+                ]
+            },
+            {
+                "description": "70 삭제 (두 자식 있는 노드)",
+                "operation": {
+                    "type": "delete",
+                    "value": 70
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 10
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            20,
+                            25,
+                            30,
+                            40,
+                            45,
+                            50,
+                            65,
+                            75,
+                            80,
+                            85
+                        ]
+                    },
+                    {
+                        "type": "find",
+                        "value": 70,
+                        "expected": -1
+                    },
+                    {
+                        "type": "find",
+                        "value": 65,
+                        "expected": "node"
+                    }
+                ]
+            },
+            {
+                "description": "50 삭제 (루트 노드)",
+                "operation": {
+                    "type": "delete",
+                    "value": 50
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 9
+                    },
+                    {
+                        "type": "rootValue",
+                        "expected": 45
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            20,
+                            25,
+                            30,
+                            40,
+                            45,
+                            65,
+                            75,
+                            80,
+                            85
+                        ]
+                    },
+                    {
+                        "type": "find",
+                        "value": 50,
+                        "expected": -1
+                    }
+                ]
+            },
+            {
+                "description": "없는 값(999) 삭제",
+                "operation": {
+                    "type": "delete",
+                    "value": 999
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": -1
+                    },
+                    {
+                        "type": "size",
+                        "expected": 9
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            20,
+                            25,
+                            30,
+                            40,
+                            45,
+                            65,
+                            75,
+                            80,
+                            85
+                        ]
+                    }
+                ]
+            },
+            {
+                "description": "모든 노드 삭제",
+                "operations": [
+                    {
+                        "type": "delete",
+                        "value": 80
+                    },
+                    {
+                        "type": "delete",
+                        "value": 20
+                    },
+                    {
+                        "type": "delete",
+                        "value": 40
+                    },
+                    {
+                        "type": "delete",
+                        "value": 25
+                    },
+                    {
+                        "type": "delete",
+                        "value": 30
+                    },
+                    {
+                        "type": "delete",
+                        "value": 65
+                    },
+                    {
+                        "type": "delete",
+                        "value": 75
+                    },
+                    {
+                        "type": "delete",
+                        "value": 85
+                    },
+                    {
+                        "type": "delete",
+                        "value": 45
+                    }
+                ],
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 0
+                    },
+                    {
+                        "type": "rootValue",
+                        "expected": null
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "특정 순서 삽입/삭제 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 5
+            },
+            {
+                "operation": "insert",
+                "value": 15
+            },
+            {
+                "operation": "insert",
+                "value": 2
+            },
+            {
+                "operation": "insert",
+                "value": 7
+            },
+            {
+                "operation": "insert",
+                "value": 12
+            },
+            {
+                "operation": "insert",
+                "value": 17
+            },
+            {
+                "operation": "insert",
+                "value": 12
+            },
+            {
+                "operation": "insert",
+                "value": 15
+            }
+        ],
+        "testSteps": [
+            {
+                "description": "초기 삽입 후 상태 확인",
+                "assertions": [
+                    {
+                        "type": "size",
+                        "expected": 9
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            2,
+                            5,
+                            7,
+                            10,
+                            12,
+                            15,
+                            17
+                        ]
+                    }
+                ]
+            },
+            {
+                "description": "12 탐색 (existCount 2)",
+                "operation": {
+                    "type": "find",
+                    "value": 12
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "nodeValue",
+                        "value": 12,
+                        "expected": 12
+                    },
+                    {
+                        "type": "existCount",
+                        "value": 12,
+                        "expected": 2
+                    }
+                ]
+            },
+            {
+                "description": "15 탐색 (existCount 2)",
+                "operation": {
+                    "type": "find",
+                    "value": 15
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "nodeValue",
+                        "value": 15,
+                        "expected": 15
+                    },
+                    {
+                        "type": "existCount",
+                        "value": 15,
+                        "expected": 2
+                    }
+                ]
+            },
+            {
+                "description": "7 삭제 (리프 노드)",
+                "operation": {
+                    "type": "delete",
+                    "value": 7
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 8
+                    },
+                    {
+                        "type": "find",
+                        "value": 7,
+                        "expected": -1
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            2,
+                            5,
+                            10,
+                            12,
+                            15,
+                            17
+                        ]
+                    }
+                ]
+            },
+            {
+                "description": "12 삭제 (existCount 감소)",
+                "operation": {
+                    "type": "delete",
+                    "value": 12
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 7
+                    },
+                    {
+                        "type": "existCount",
+                        "value": 12,
+                        "expected": 1
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            2,
+                            5,
+                            10,
+                            12,
+                            15,
+                            17
+                        ]
+                    }
+                ]
+            },
+            {
+                "description": "5 삭제 (한쪽 자식만 있는 노드)",
+                "operation": {
+                    "type": "delete",
+                    "value": 5
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 6
+                    },
+                    {
+                        "type": "find",
+                        "value": 5,
+                        "expected": -1
+                    },
+                    {
+                        "type": "find",
+                        "value": 2,
+                        "expected": "node"
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            2,
+                            10,
+                            12,
+                            15,
+                            17
+                        ]
+                    }
+                ]
+            },
+            {
+                "description": "15 두 번 삭제",
+                "operations": [
+                    {
+                        "type": "delete",
+                        "value": 15
+                    },
+                    {
+                        "type": "delete",
+                        "value": 15
+                    }
+                ],
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 4
+                    },
+                    {
+                        "type": "find",
+                        "value": 15,
+                        "expected": -1
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            2,
+                            10,
+                            12,
+                            17
+                        ]
+                    }
+                ]
+            },
+            {
+                "description": "10 삭제 (루트 노드)",
+                "operation": {
+                    "type": "delete",
+                    "value": 10
+                },
+                "assertions": [
+                    {
+                        "type": "statusCode",
+                        "expected": 0
+                    },
+                    {
+                        "type": "size",
+                        "expected": 3
+                    },
+                    {
+                        "type": "rootValue",
+                        "expected": 2
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            2,
+                            12,
+                            17
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
