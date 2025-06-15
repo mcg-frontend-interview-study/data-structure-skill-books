@@ -33,6 +33,10 @@ export class BSTNode<T> {
         this._parent = node;
     }
 
+    clearParent() {
+        this._parent = null;
+    }
+
     getLeft() {
         return this._left;
     }
@@ -59,6 +63,10 @@ export class BSTNode<T> {
 
     isNotSingle() {
         return this._existCount > 1;
+    }
+
+    getExistCount() {
+        return this._existCount;
     }
 
     addExistCount() {
