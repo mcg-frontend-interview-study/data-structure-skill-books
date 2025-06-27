@@ -19,4 +19,4 @@ npm run test:coverage
 
 # Maker
 
--   [pakxe](https://github.com/mcg-frontend-interview-study/data-structure-skill-books/tree/pakxe)
+- [pakxe](https://github.com/mcg-frontend-interview-study/data-structure-skill-books/tree/pakxe)
