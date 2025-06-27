@@ -1,6 +1,21 @@
 {
+  "name": "@mcg_/data-structure-skill-books",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "keywords": [
+    "data structure",
+    "typescript",
+    "trie",
+    "set",
+    "bst"
+  ],
+  "license": "MIT",
   "scripts": {
+    "build": "tsc",
     "start": "npx tsx",
     "test": "jest",
     "test:coverage": "jest --coverage --coverageReporters=text"
