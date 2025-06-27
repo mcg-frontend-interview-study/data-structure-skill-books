@@ -68,20 +68,27 @@ describe("Tree ― unit tests", () => {
   });
 
   describe("iterator test", () => {
-    it("[Symbol.iterator]는 전위(DFS) 순회한다.", () => {
+    it("[Symbol.iterator]는 전위(Pre-order) 순회한다.", () => {
       const { root } = buildSampleTree();
       const ids = [...root].map((n) => n.id);
       expect(ids).toEqual(["root", "a", "c", "b"]);
     });
 
-    it("postOrder()는 후위(BFS) 순회한다.", () => {
+    it("postOrder()는 후위(Post-order) 순회한다.", () => {
       const { root } = buildSampleTree();
       const ids = [...root.postOrder()].map((n) => n.id);
-      expect(ids).toEqual(["root", "a", "b", "c"]);
+      expect(ids).toEqual(["c", "a", "b", "root"]);
     });
 
-    it("values()는 노드 값을 전위 순서로 반환된다.", () => {
+    it("inOrder()는 중위(In-order) 순회한다.", () => {
       const { root } = buildSampleTree();
+      const ids = [...root.inOrder()].map((n) => n.id);
+      expect(ids).toEqual(["c", "a", "root", "b"]);
+    });
+
+    it("keys()와 values()는 전위(Pre-order) 순서로 반환한다.", () => {
+      const { root } = buildSampleTree();
+      expect([...root.keys()]).toEqual(["root", "a", "c", "b"]);
       expect([...root.values()]).toEqual(["R", "A", "C", "B"]);
     });
   });

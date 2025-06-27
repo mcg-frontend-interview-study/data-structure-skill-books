@@ -54,7 +54,6 @@ describe("Tree Scenario Test", () => {
 
       expect(tree.root.size).toBe(4);
       expect(tree.c.parent).toBe(tree.b);
-      // a 밑은 빈 노드, 순회 결과 root, a, b, c
       expect(serial(tree.root)).toBe("root:R > a:A > b:B > c:C");
     });
   });
@@ -97,19 +96,25 @@ describe("Tree Scenario Test", () => {
       expect(serial(tree.root)).toBe("root:R > a:A > c:C > b:B");
     });
   });
-  describe("4. iterator & values scenario", () => {
+
+  describe("4. iterator & traversal scenario", () => {
     it("전위 순회(iterator) 결과는 [R, A, C, B] 순이다", () => {
-      const ids = [...tree.root].map((n) => n.node);
-      expect(ids).toEqual(["R", "A", "C", "B"]);
+      const nodes = [...tree.root].map((n) => n.node);
+      expect(nodes).toEqual(["R", "A", "C", "B"]);
     });
 
     it("values() 역시 [R, A, C, B] 순을 돌려준다", () => {
       expect([...tree.root.values()]).toEqual(["R", "A", "C", "B"]);
     });
 
-    it("postOrder()는 [R, A, B, C] BFS 레벨 순이다", () => {
-      const ids = [...tree.root.postOrder()].map((n) => n.node);
-      expect(ids).toEqual(["R", "A", "B", "C"]);
+    it("inOrder()는 [C, A, R, B] 중위 순서다", () => {
+      const nodes = [...tree.root.inOrder()].map((n) => n.node);
+      expect(nodes).toEqual(["C", "A", "R", "B"]);
+    });
+
+    it("postOrder()는 후위 순회로 [C, A, B, R] 이다", () => {
+      const nodes = [...tree.root.postOrder()].map((n) => n.node);
+      expect(nodes).toEqual(["C", "A", "B", "R"]);
     });
   });
 });

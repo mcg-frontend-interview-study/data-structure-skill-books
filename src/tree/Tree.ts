@@ -98,13 +98,28 @@ export class Tree<T> {
     }
   }
 
-  *postOrder(): Generator<Tree<T>> {
-    const queue: Tree<T>[] = [this];
-    while (queue.length) {
-      const cur = queue.shift()!;
-      yield cur;
-      queue.push(...cur._children.values());
+  *inOrder(): Generator<Tree<T>> {
+    const kids = Array.from(this._children.values());
+    if (kids.length > 0) {
+      yield* kids[0].inOrder();
     }
+
+    yield this;
+
+    for (let i = 1; i < kids.length; i++) {
+      yield* kids[i].inOrder();
+    }
+  }
+
+  *postOrder(): Generator<Tree<T>> {
+    for (const child of this._children.values()) {
+      yield* child.postOrder();
+    }
+    yield this;
+  }
+
+  *keys(): Generator<string> {
+    for (const node of this) yield node.id;
   }
 
   *values(): Generator<T> {
