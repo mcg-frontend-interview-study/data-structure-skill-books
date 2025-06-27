@@ -17,6 +17,6 @@ npm run test
 npm run test:coverage
 ```
 
-# Maker
+# npm
 
-- [pakxe](https://github.com/mcg-frontend-interview-study/data-structure-skill-books/tree/pakxe)
+[npm](https://www.npmjs.com/package/@mcg_/data-structure-skill-books)
