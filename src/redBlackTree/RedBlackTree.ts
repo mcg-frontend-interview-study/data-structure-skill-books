@@ -1,4 +1,5 @@
 import { Comparator, COMPARISON_RESULT, defaultNumberComparator } from "../comparator/comparator";
+import { STATUS_CODE } from "../constants/statusCode";
 import { NilNode, RedBlackTreeNode } from "./RedBlackTreeNode";
 
 export class RedBlackTree<T> {
@@ -246,6 +247,37 @@ export class RedBlackTree<T> {
         } else {
             childNode.parent = null;
             this._root = childNode;
+        }
+    }
+
+    find(value: T) {
+        if (!this._root) {
+            return STATUS_CODE.NOT_FOUND;
+        }
+
+        return this._find(this._root, value);
+    }
+
+    private _find(node: RedBlackTreeNode<T>, value: T) {
+        const comparisonResult = this._comparator(value, node.value);
+
+        switch (comparisonResult) {
+            case COMPARISON_RESULT.EQUAL:
+                return node;
+
+            case COMPARISON_RESULT.GREATER_THAN:
+                if (!node.right || node.right instanceof NilNode) {
+                    return STATUS_CODE.NOT_FOUND;
+                } else {
+                    return this._find(node.right, value);
+                }
+
+            case COMPARISON_RESULT.LESS_THAN:
+                if (!node.left || node.left instanceof NilNode) {
+                    return STATUS_CODE.NOT_FOUND;
+                } else {
+                    return this._find(node.left, value);
+                }
         }
     }
 
