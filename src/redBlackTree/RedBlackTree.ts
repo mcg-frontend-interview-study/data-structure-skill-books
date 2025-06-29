@@ -176,10 +176,6 @@ export class RedBlackTree<T> {
           siblingNode = parentNode.right as RedBlackTreeNode<T>;
         }
 
-        if (siblingNode instanceof NilNode) {
-          break;
-        }
-
         if (siblingNode) {
           const leftChildColor = siblingNode.left instanceof RedBlackTreeNode ? siblingNode.left.color : '#000';
           const rightChildColor = siblingNode.right instanceof RedBlackTreeNode ? siblingNode.right.color : '#000';
