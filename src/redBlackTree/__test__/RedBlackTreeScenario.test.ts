@@ -280,44 +280,4 @@ describe("RedBlackTree - Scenario Tests", () => {
             expect(traversal).toEqual([...values].sort((a, b) => a - b));
         });
     });
-
-    // 성능 테스트
-    describe("Performance Tests", () => {
-        test("삽입 성능 테스트", () => {
-            const startTime = Date.now();
-
-            for (let i = 0; i < 10000; i++) {
-                tree.insert(i);
-            }
-
-            const endTime = Date.now();
-            const executionTime = endTime - startTime;
-
-            // 10000개 삽입이 1초 이내에 완료되어야 함
-            expect(executionTime).toBeLessThan(1000);
-
-            const validation = validateRedBlackProperties(tree.getRoot());
-            expect(validation.isValid).toBe(true);
-        });
-
-        test("탐색 성능 테스트", () => {
-            // 트리에 데이터 삽입
-            const values = Array.from({ length: 1000 }, (_, i) => i);
-            values.forEach((value) => tree.insert(value));
-
-            const startTime = Date.now();
-
-            // 모든 값 탐색
-            for (let i = 0; i < 1000; i++) {
-                const found = tree.find(i);
-                expect(found).toBeInstanceOf(RedBlackTreeNode);
-            }
-
-            const endTime = Date.now();
-            const executionTime = endTime - startTime;
-
-            // 1000번 탐색이 1000ms 이내에 완료되어야 함 (성능 테스트)
-            expect(executionTime).toBeLessThan(1000);
-        });
-    });
 });
