@@ -14,26 +14,20 @@ export class NilNode implements TreeNodeInterface<any> {
   public color: NodeColor = '#000';
   public parent: TreeNodeInterface<any> | null = null;
   public blackChip: boolean = false;
-
-  constructor() {
-    // TNULL 센티넬 노드
-  }
 }
 
 export class RedBlackTreeNode<T> implements TreeNodeInterface<T> {
+  public color: NodeColor = '#f00';
+  public parent: TreeNodeInterface<T> | null = null;
+  public blackChip: boolean = false;
+
   public value: T;
-  public color: NodeColor;
   public left: TreeNodeInterface<T> | null;
   public right: TreeNodeInterface<T> | null;
-  public parent: TreeNodeInterface<T> | null;
-  public blackChip: boolean;
 
   constructor(value: T, nilNode: NilNode) {
     this.value = value;
-    this.color = '#f00';
     this.left = nilNode;
     this.right = nilNode;
-    this.parent = null;
-    this.blackChip = false;
   }
 }
