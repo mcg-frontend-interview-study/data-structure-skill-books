@@ -1,330 +1,394 @@
-import { Comparator, COMPARISON_RESULT, defaultNumberComparator } from "../comparator/comparator";
-import { STATUS_CODE } from "../constants/statusCode";
-import { NilNode, RedBlackTreeNode } from "./RedBlackTreeNode";
+/**
+ * Red-Black Tree 구현
+ * 자동 균형 유지를 위해 5가지 속성을 만족해야 함
+ * TNULL 센티넬 노드로 null 처리를 단순화
+ */
+
+import {Comparator, COMPARISON_RESULT, defaultNumberComparator} from '../comparator/comparator';
+import {NilNode, RedBlackTreeNode, TreeNodeInterface} from './RedBlackTreeNode';
 
 export class RedBlackTree<T> {
-    private _root: RedBlackTreeNode<T> | null;
+  private readonly TNULL: NilNode;
+  private _root: TreeNodeInterface<T>;
+  private _comparator: Comparator<T>;
 
-    private _comparator: Comparator<T>;
+  constructor(comparator: Comparator<T>) {
+    this.TNULL = new NilNode();
+    this._root = this.TNULL;
+    this._comparator = comparator;
+  }
 
-    constructor(comparator: Comparator<T>) {
-        this._root = null;
+  getRoot(): TreeNodeInterface<T> {
+    return this._root;
+  }
 
-        this._comparator = comparator;
+  insert(value: T) {
+    const newNode = new RedBlackTreeNode<T>(value, this.TNULL);
+
+    let parentNode: RedBlackTreeNode<T> | null = null;
+    let currentNode: TreeNodeInterface<T> = this._root;
+
+    while (currentNode instanceof RedBlackTreeNode) {
+      parentNode = currentNode;
+      const comparisonResult = this._comparator(newNode.value, parentNode.value);
+      if (comparisonResult === COMPARISON_RESULT.LESS_THAN) {
+        currentNode = parentNode.left || this.TNULL;
+      } else if (comparisonResult === COMPARISON_RESULT.GREATER_THAN) {
+        currentNode = parentNode.right || this.TNULL;
+      } else {
+        return; // 중복 값 허용 안함
+      }
     }
 
-    getRoot() {
-        return this._root;
+    newNode.parent = parentNode;
+    if (parentNode === null) {
+      this._root = newNode;
+    } else if (this._comparator(newNode.value, parentNode.value) === COMPARISON_RESULT.LESS_THAN) {
+      parentNode.left = newNode;
+    } else {
+      parentNode.right = newNode;
     }
 
-    insert(value: T) {
-        const newNode = new RedBlackTreeNode<T>(value);
-        const rootNode = this.getRoot();
+    if (newNode.parent === null) {
+      newNode.color = '#000';
+      return;
+    }
 
-        // 첫 추가
-        if (rootNode == null) {
-            newNode.color = "#000";
+    if (newNode.parent.parent === null) {
+      return;
+    }
 
-            this._root = newNode;
+    this._fixWhenInsert(newNode);
+  }
+
+  private _fixWhenInsert(insertedNode: RedBlackTreeNode<T>) {
+    let currentNode = insertedNode;
+    while (currentNode.parent && currentNode.parent.color === '#f00') {
+      const parentNode = currentNode.parent as RedBlackTreeNode<T>;
+      const grandParentNode = parentNode.parent as RedBlackTreeNode<T>;
+
+      if (!grandParentNode) break;
+
+      if (parentNode === grandParentNode.right) {
+        const uncleNode = grandParentNode.left;
+        if (uncleNode instanceof RedBlackTreeNode && uncleNode.color === '#f00') {
+          uncleNode.color = '#000';
+          parentNode.color = '#000';
+          grandParentNode.color = '#f00';
+          currentNode = grandParentNode;
         } else {
-            this._insertByIteration(rootNode, newNode);
-
-            if (!newNode.parent) {
-                throw new Error("insert할 때 newNode.parent를 지정해주세요.");
-            }
-
-            this._fixWhenInsert(rootNode, newNode.parent, newNode);
+          if (currentNode === parentNode.left) {
+            currentNode = parentNode;
+            this._rotateRight(currentNode);
+          }
+          const newParent = currentNode.parent as RedBlackTreeNode<T>;
+          const newGrandParent = newParent?.parent as RedBlackTreeNode<T>;
+          if (newParent && newGrandParent) {
+            newParent.color = '#000';
+            newGrandParent.color = '#f00';
+            this._rotateLeft(newGrandParent);
+          }
         }
-    }
-
-    private _insertByIteration(parentNode: RedBlackTreeNode<T>, newNode: RedBlackTreeNode<T>) {
-        const comparisonResult = this._comparator(newNode.value, parentNode.value);
-
-        switch (comparisonResult) {
-            case COMPARISON_RESULT.EQUAL:
-                throw new Error("중복되는 노드는 넣을 수 없습니다.");
-
-            case COMPARISON_RESULT.GREATER_THAN:
-                if (parentNode.right instanceof NilNode) {
-                    // 비어 있는 경우
-                    parentNode.right = newNode;
-                    newNode.parent = parentNode;
-                } else {
-                    this._insertByIteration(parentNode.right, newNode);
-                }
-                break;
-
-            case COMPARISON_RESULT.LESS_THAN:
-                if (parentNode.left instanceof NilNode) {
-                    // 비어 있는 경우
-                    parentNode.left = newNode;
-                    newNode.parent = parentNode;
-                } else {
-                    this._insertByIteration(parentNode.left, newNode);
-                }
-                break;
-        }
-    }
-
-    private _fixWhenInsert(
-        rootNode: RedBlackTreeNode<T>,
-        parentNode: RedBlackTreeNode<T>,
-        newNode: RedBlackTreeNode<T>
-    ) {
-        let childNode = newNode;
-        // if (newNode.value === 21) {
-        //     console.log(parentNode);
-        // }
-        // [ valid ] 부모 Black
-        if (parentNode.color === "#000") {
-            return;
-        }
-
-        while (parentNode.color === "#f00") {
-            let grandParentNode = parentNode.parent;
-
-            if (!grandParentNode) {
-                // 현재 parentNode가 root라면 룰을 반드시 준수한다.
-                break;
-            }
-
-            const uncleNode = grandParentNode.left === parentNode ? grandParentNode.right : grandParentNode.left;
-
-            if (uncleNode instanceof NilNode || uncleNode.color === "#000") {
-                // case 2에서는 rule이 반드시 지켜지므로 break 가능
-                // [ case 2.1 ] 부모 형제 (x || Black) && 꺾임
-
-                if (grandParentNode.left === parentNode && parentNode.right === childNode) {
-                    // 그믐달 꺾임
-
-                    this._RotateLeft({
-                        childNode,
-                        parentNode,
-                        grandParentNode,
-                    });
-
-                    [childNode, parentNode] = [parentNode, childNode];
-                } else if (grandParentNode.right === parentNode && parentNode.left === childNode) {
-                    // 초승달 꺾임
-                    this._RotateRight({
-                        childNode,
-                        parentNode,
-                        grandParentNode,
-                    });
-
-                    [childNode, parentNode] = [parentNode, childNode];
-                }
-
-                // 꺾임 해결 후 반드시 직선이 된다.
-                // [ case 2.2 ] 부모 형제 (x || Black) && 직선
-                if (grandParentNode.left === parentNode && parentNode.left === childNode) {
-                    // 왼쪽 직선
-                    this._swapColor({ greatParentNode: grandParentNode, parentNode });
-
-                    this._RotateRight({
-                        childNode: parentNode,
-                        parentNode: grandParentNode,
-                        grandParentNode: grandParentNode.parent,
-                    });
-
-                    [parentNode, grandParentNode] = [grandParentNode, parentNode];
-                } else if (grandParentNode.right === parentNode && parentNode.right === childNode) {
-                    // 오른쪽 직선
-                    this._swapColor({ greatParentNode: grandParentNode, parentNode });
-
-                    this._RotateLeft({
-                        childNode: parentNode,
-                        parentNode: grandParentNode,
-                        grandParentNode: grandParentNode.parent,
-                    });
-                    [parentNode, grandParentNode] = [grandParentNode, parentNode];
-                }
-
-                break;
-            } else {
-                // [ case 1 ] 부모 형제 Red <- 문제가 전파될 가능성이 있으므로 while
-                // sol) switch
-
-                this._switchColor({ parentNode: grandParentNode, leftNode: uncleNode, rightNode: parentNode });
-
-                // 다음 턴 준비
-                newNode = grandParentNode;
-
-                if (!grandParentNode.parent) {
-                    break;
-                } else {
-                    parentNode = grandParentNode.parent;
-                }
-            }
-        }
-
-        rootNode.color = "#000";
-    }
-
-    // 둘의 컬러만
-    private _swapColor({
-        parentNode,
-        greatParentNode,
-    }: {
-        parentNode: RedBlackTreeNode<T>;
-        greatParentNode: RedBlackTreeNode<T>;
-    }) {
-        parentNode.color = "#000";
-        greatParentNode.color = "#f00";
-    }
-
-    // 세모 구조에서 자식들과 부모가 색 스위치
-    private _switchColor({
-        parentNode,
-        leftNode,
-        rightNode,
-    }: {
-        parentNode: RedBlackTreeNode<T>;
-        leftNode: RedBlackTreeNode<T>;
-        rightNode: RedBlackTreeNode<T>;
-    }) {
-        parentNode.color = "#f00";
-
-        leftNode.color = "#000";
-        rightNode.color = "#000";
-    }
-    private _RotateLeft({
-        childNode,
-        parentNode,
-        grandParentNode,
-    }: {
-        childNode: RedBlackTreeNode<T>;
-        parentNode: RedBlackTreeNode<T>;
-        grandParentNode: RedBlackTreeNode<T> | null;
-    }) {
-        const isLeftParent = grandParentNode?.left === parentNode;
-
-        const transplantationSubTree = childNode.left;
-        parentNode.right = transplantationSubTree;
-        transplantationSubTree.parent = parentNode;
-
-        childNode.left = parentNode;
-        parentNode.parent = childNode;
-
-        if (grandParentNode) {
-            childNode.parent = grandParentNode;
-            if (isLeftParent) {
-                grandParentNode.left = childNode;
-            } else {
-                grandParentNode.right = childNode;
-            }
+      } else {
+        const uncleNode = grandParentNode.right;
+        if (uncleNode instanceof RedBlackTreeNode && uncleNode.color === '#f00') {
+          uncleNode.color = '#000';
+          parentNode.color = '#000';
+          grandParentNode.color = '#f00';
+          currentNode = grandParentNode;
         } else {
-            childNode.parent = null;
-            this._root = childNode;
+          if (currentNode === parentNode.right) {
+            currentNode = parentNode;
+            this._rotateLeft(currentNode);
+          }
+          const newParent = currentNode.parent as RedBlackTreeNode<T>;
+          const newGrandParent = newParent?.parent as RedBlackTreeNode<T>;
+          if (newParent && newGrandParent) {
+            newParent.color = '#000';
+            newGrandParent.color = '#f00';
+            this._rotateRight(newGrandParent);
+          }
         }
+      }
+      if (currentNode === this._root) break;
+    }
+    if (this._root instanceof RedBlackTreeNode) {
+      this._root.color = '#000';
+    }
+  }
+
+  delete(value: T) {
+    const targetNode = this.find(value);
+    if (targetNode === this.TNULL) return;
+
+    const nodeToDelete = targetNode as RedBlackTreeNode<T>;
+    let actuallyDeletedNode: TreeNodeInterface<T> = nodeToDelete;
+    let originalColor = actuallyDeletedNode.color;
+    let replacementNode: TreeNodeInterface<T>;
+
+    if (nodeToDelete.left === this.TNULL) {
+      replacementNode = nodeToDelete.right || this.TNULL;
+      this._transplant(nodeToDelete, replacementNode);
+    } else if (nodeToDelete.right === this.TNULL) {
+      replacementNode = nodeToDelete.left || this.TNULL;
+      this._transplant(nodeToDelete, replacementNode);
+    } else {
+      actuallyDeletedNode = this._findSuccessor(nodeToDelete.right || this.TNULL);
+      originalColor = actuallyDeletedNode.color;
+      replacementNode = (actuallyDeletedNode as RedBlackTreeNode<T>).right || this.TNULL;
+
+      if (actuallyDeletedNode.parent === nodeToDelete) {
+        replacementNode.parent = actuallyDeletedNode;
+      } else {
+        this._transplant(actuallyDeletedNode as RedBlackTreeNode<T>, replacementNode);
+        (actuallyDeletedNode as RedBlackTreeNode<T>).right = nodeToDelete.right;
+        if ((actuallyDeletedNode as RedBlackTreeNode<T>).right) {
+          ((actuallyDeletedNode as RedBlackTreeNode<T>).right as TreeNodeInterface<T>).parent = actuallyDeletedNode;
+        }
+      }
+      this._transplant(nodeToDelete, actuallyDeletedNode as RedBlackTreeNode<T>);
+      (actuallyDeletedNode as RedBlackTreeNode<T>).left = nodeToDelete.left;
+      if ((actuallyDeletedNode as RedBlackTreeNode<T>).left) {
+        ((actuallyDeletedNode as RedBlackTreeNode<T>).left as TreeNodeInterface<T>).parent = actuallyDeletedNode;
+      }
+      actuallyDeletedNode.color = nodeToDelete.color;
     }
 
-    private _RotateRight({
-        childNode,
-        parentNode,
-        grandParentNode,
-    }: {
-        childNode: RedBlackTreeNode<T>;
-        parentNode: RedBlackTreeNode<T>;
-        grandParentNode: RedBlackTreeNode<T> | null;
-    }) {
-        const isLeftMiddle = grandParentNode?.left === parentNode;
+    if (originalColor === '#000') {
+      replacementNode.blackChip = true;
+      this._fixWhenDelete(replacementNode);
+    }
+  }
 
-        const transplantationSubTree = childNode.right;
-        parentNode.left = transplantationSubTree;
-        transplantationSubTree.parent = parentNode;
+  private _fixWhenDelete(doubleBlackNode: TreeNodeInterface<T>) {
+    let currentDoubleBlackNode = doubleBlackNode;
 
-        childNode.right = parentNode;
-        parentNode.parent = childNode;
+    while (currentDoubleBlackNode !== this._root && currentDoubleBlackNode.blackChip) {
+      const parentNode = currentDoubleBlackNode.parent as RedBlackTreeNode<T>;
 
-        if (grandParentNode) {
-            childNode.parent = grandParentNode;
-            if (isLeftMiddle) {
-                grandParentNode.left = childNode;
+      if (currentDoubleBlackNode === parentNode.left) {
+        let siblingNode = parentNode.right as RedBlackTreeNode<T> | null;
+
+        if (siblingNode instanceof RedBlackTreeNode && siblingNode.color === '#f00') {
+          siblingNode.color = '#000';
+          parentNode.color = '#f00';
+          this._rotateLeft(parentNode);
+          siblingNode = parentNode.right as RedBlackTreeNode<T>;
+        }
+
+        if (siblingNode instanceof NilNode) {
+          break;
+        }
+
+        if (siblingNode) {
+          const leftChildColor = siblingNode.left instanceof RedBlackTreeNode ? siblingNode.left.color : '#000';
+          const rightChildColor = siblingNode.right instanceof RedBlackTreeNode ? siblingNode.right.color : '#000';
+
+          if (leftChildColor === '#000' && rightChildColor === '#000') {
+            siblingNode.color = '#f00';
+            currentDoubleBlackNode.blackChip = false;
+
+            if (parentNode.color === '#f00') {
+              parentNode.color = '#000';
+              break;
             } else {
-                grandParentNode.right = childNode;
+              currentDoubleBlackNode = parentNode;
+              currentDoubleBlackNode.blackChip = true;
             }
-        } else {
-            childNode.parent = null;
-            this._root = childNode;
+          } else {
+            if (rightChildColor === '#000') {
+              if (siblingNode.left instanceof RedBlackTreeNode) {
+                siblingNode.left.color = '#000';
+              }
+              siblingNode.color = '#f00';
+              this._rotateRight(siblingNode);
+              siblingNode = parentNode.right as RedBlackTreeNode<T>;
+            }
+
+            if (siblingNode instanceof RedBlackTreeNode) {
+              siblingNode.color = parentNode.color;
+              if (siblingNode.right instanceof RedBlackTreeNode) {
+                siblingNode.right.color = '#000';
+              }
+            }
+            parentNode.color = '#000';
+            this._rotateLeft(parentNode);
+            currentDoubleBlackNode = this._root;
+          }
         }
+      } else {
+        let siblingNode = parentNode.left as RedBlackTreeNode<T> | null;
+
+        if (siblingNode instanceof RedBlackTreeNode && siblingNode.color === '#f00') {
+          siblingNode.color = '#000';
+          parentNode.color = '#f00';
+          this._rotateRight(parentNode);
+          siblingNode = parentNode.left as RedBlackTreeNode<T>;
+        }
+
+        if (siblingNode instanceof NilNode) break;
+
+        if (siblingNode) {
+          const leftChildColor = siblingNode.left instanceof RedBlackTreeNode ? siblingNode.left.color : '#000';
+          const rightChildColor = siblingNode.right instanceof RedBlackTreeNode ? siblingNode.right.color : '#000';
+
+          if (leftChildColor === '#000' && rightChildColor === '#000') {
+            siblingNode.color = '#f00';
+            currentDoubleBlackNode.blackChip = false;
+
+            if (parentNode.color === '#f00') {
+              parentNode.color = '#000';
+              break;
+            } else {
+              currentDoubleBlackNode = parentNode;
+              currentDoubleBlackNode.blackChip = true;
+            }
+          } else {
+            if (leftChildColor === '#000') {
+              if (siblingNode.right instanceof RedBlackTreeNode) {
+                siblingNode.right.color = '#000';
+              }
+              siblingNode.color = '#f00';
+              this._rotateLeft(siblingNode);
+              siblingNode = parentNode.left as RedBlackTreeNode<T>;
+            }
+
+            if (siblingNode instanceof RedBlackTreeNode) {
+              siblingNode.color = parentNode.color;
+              if (siblingNode.left instanceof RedBlackTreeNode) {
+                siblingNode.left.color = '#000';
+              }
+            }
+            parentNode.color = '#000';
+            this._rotateRight(parentNode);
+            currentDoubleBlackNode = this._root;
+          }
+        }
+      }
     }
+    currentDoubleBlackNode.blackChip = false;
+  }
 
-    find(value: T) {
-        if (!this._root) {
-            return STATUS_CODE.NOT_FOUND;
-        }
-
-        return this._find(this._root, value);
+  private _transplant(oldNode: TreeNodeInterface<T>, newNode: TreeNodeInterface<T>) {
+    if (oldNode.parent === null) {
+      this._root = newNode;
+    } else if (oldNode === oldNode.parent.left) {
+      oldNode.parent.left = newNode;
+    } else {
+      oldNode.parent.right = newNode;
     }
+    newNode.parent = oldNode.parent;
+  }
 
-    private _find(node: RedBlackTreeNode<T>, value: T) {
-        const comparisonResult = this._comparator(value, node.value);
-
-        switch (comparisonResult) {
-            case COMPARISON_RESULT.EQUAL:
-                return node;
-
-            case COMPARISON_RESULT.GREATER_THAN:
-                if (!node.right || node.right instanceof NilNode) {
-                    return STATUS_CODE.NOT_FOUND;
-                } else {
-                    return this._find(node.right, value);
-                }
-
-            case COMPARISON_RESULT.LESS_THAN:
-                if (!node.left || node.left instanceof NilNode) {
-                    return STATUS_CODE.NOT_FOUND;
-                } else {
-                    return this._find(node.left, value);
-                }
-        }
+  private _findSuccessor(startNode: TreeNodeInterface<T>): RedBlackTreeNode<T> {
+    let currentNode = startNode as RedBlackTreeNode<T>;
+    while (currentNode.left !== this.TNULL && currentNode.left instanceof RedBlackTreeNode) {
+      currentNode = currentNode.left;
     }
+    return currentNode;
+  }
 
-    print() {
-        if (this._root === null) {
-            console.log("Tree is empty.");
-            return;
-        }
-        this._printNode(this._root, "", true);
+  private _rotateLeft(pivotNode: RedBlackTreeNode<T>) {
+    const rightChild = pivotNode.right as RedBlackTreeNode<T>;
+    if (!rightChild || rightChild === this.TNULL) return;
+
+    pivotNode.right = rightChild.left;
+    if (rightChild.left !== this.TNULL && rightChild.left) {
+      rightChild.left.parent = pivotNode;
     }
-
-    private _printNode(node: RedBlackTreeNode<T>, prefix: string, isTail: boolean) {
-        const nodeColor = node.color === "#000" ? "⬛️" : "🟥";
-        console.log(`${prefix}${isTail ? "└── " : "├── "}${node.value} (${nodeColor})`);
-
-        const children: RedBlackTreeNode<T>[] = [];
-        if (!(node.left instanceof NilNode)) {
-            children.push(node.left);
-        }
-        if (!(node.right instanceof NilNode)) {
-            children.push(node.right);
-        }
-
-        for (let i = 0; i < children.length; i++) {
-            const newPrefix = prefix + (isTail ? "    " : "│   ");
-            this._printNode(children[i], newPrefix, i === children.length - 1);
-        }
+    rightChild.parent = pivotNode.parent;
+    if (pivotNode.parent === null) {
+      this._root = rightChild;
+    } else if (pivotNode === pivotNode.parent.left) {
+      pivotNode.parent.left = rightChild;
+    } else {
+      pivotNode.parent.right = rightChild;
     }
+    rightChild.left = pivotNode;
+    pivotNode.parent = rightChild;
+  }
+
+  private _rotateRight(pivotNode: RedBlackTreeNode<T>) {
+    const leftChild = pivotNode.left as RedBlackTreeNode<T>;
+    if (!leftChild || leftChild === this.TNULL) return;
+
+    pivotNode.left = leftChild.right;
+    if (leftChild.right !== this.TNULL && leftChild.right) {
+      leftChild.right.parent = pivotNode;
+    }
+    leftChild.parent = pivotNode.parent;
+    if (pivotNode.parent === null) {
+      this._root = leftChild;
+    } else if (pivotNode === pivotNode.parent.right) {
+      pivotNode.parent.right = leftChild;
+    } else {
+      pivotNode.parent.left = leftChild;
+    }
+    leftChild.right = pivotNode;
+    pivotNode.parent = leftChild;
+  }
+
+  find(value: T): TreeNodeInterface<T> {
+    let currentNode: TreeNodeInterface<T> = this._root;
+    while (currentNode instanceof RedBlackTreeNode) {
+      const comparisonResult = this._comparator(value, currentNode.value);
+      if (comparisonResult === COMPARISON_RESULT.EQUAL) {
+        return currentNode;
+      } else if (comparisonResult === COMPARISON_RESULT.LESS_THAN) {
+        currentNode = currentNode.left || this.TNULL;
+      } else {
+        currentNode = currentNode.right || this.TNULL;
+      }
+    }
+    return this.TNULL;
+  }
+
+  print() {
+    if (this._root !== this.TNULL) {
+      this._printNode(this._root, '', true);
+    }
+  }
+
+  private _printNode(node: TreeNodeInterface<T>, prefix: string, isTail: boolean) {
+    if (node instanceof RedBlackTreeNode) {
+      const color = node.color === '#f00' ? '🟥' : '⬛️';
+      console.log(`${prefix}${isTail ? '└── ' : '├── '}${node.value} (${color})`);
+
+      const children: Array<{node: TreeNodeInterface<T>; isLeft: boolean}> = [];
+      if (node.left !== this.TNULL && node.left) children.push({node: node.left, isLeft: true});
+      if (node.right !== this.TNULL && node.right) children.push({node: node.right, isLeft: false});
+
+      children.forEach((child, index) => {
+        const isLast = index === children.length - 1;
+        const newPrefix = prefix + (isTail ? '    ' : '│   ');
+        this._printNode(child.node, newPrefix, isLast);
+      });
+    }
+  }
 }
 
-const a = new RedBlackTree<number>(defaultNumberComparator);
+const redBlackTree = new RedBlackTree<number>(defaultNumberComparator);
 
-a.insert(14);
-a.insert(7);
-a.insert(17);
-a.insert(12);
-a.insert(4);
-a.insert(3);
-a.insert(5);
+redBlackTree.insert(14);
+redBlackTree.insert(7);
+redBlackTree.insert(17);
+redBlackTree.insert(12);
+redBlackTree.insert(4);
+redBlackTree.insert(3);
+redBlackTree.insert(5);
 
-a.insert(15);
-a.insert(22);
-a.insert(19);
-a.insert(24);
+redBlackTree.insert(15);
+redBlackTree.insert(22);
+redBlackTree.insert(19);
+redBlackTree.insert(24);
 
-a.insert(2);
-a.insert(21);
-a.insert(20);
+redBlackTree.insert(2);
+redBlackTree.insert(21);
+redBlackTree.insert(20);
+redBlackTree.delete(20);
+redBlackTree.delete(17);
+redBlackTree.delete(19);
+redBlackTree.delete(7);
+redBlackTree.delete(14);
 
-a.print();
+redBlackTree.print();
