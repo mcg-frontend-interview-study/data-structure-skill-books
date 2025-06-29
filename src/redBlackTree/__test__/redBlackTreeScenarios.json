@@ -1,0 +1,789 @@
+[
+    {
+        "name": "기본 삽입 시나리오 - 루트 노드",
+        "initialOperations": [],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 10
+                },
+                "assertions": [
+                    {
+                        "type": "rootValue",
+                        "expected": 10
+                    },
+                    {
+                        "type": "rootColor",
+                        "expected": "black"
+                    },
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            10
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "간단한 Red-Red violation 해결",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 10
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 5
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            5,
+                            10
+                        ]
+                    }
+                ]
+            },
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 15
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            5,
+                            10,
+                            15
+                        ]
+                    }
+                ]
+            },
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 3
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            3,
+                            5,
+                            10,
+                            15
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Left-Left case 회전 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 5
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            5,
+                            10,
+                            20,
+                            25,
+                            30,
+                            40
+                        ]
+                    },
+                    {
+                        "type": "maxBlackHeight",
+                        "expected": 4
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Right-Right case 회전 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 5
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 15
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 40
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            5,
+                            10,
+                            15,
+                            20,
+                            30,
+                            40
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "복잡한 삽입 삭제 혼합 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 50
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 70
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 60
+            },
+            {
+                "operation": "insert",
+                "value": 80
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "delete",
+                    "value": 20
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            30,
+                            40,
+                            50,
+                            60,
+                            70,
+                            80
+                        ]
+                    }
+                ]
+            },
+            {
+                "operation": {
+                    "type": "delete",
+                    "value": 30
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            40,
+                            50,
+                            60,
+                            70,
+                            80
+                        ]
+                    }
+                ]
+            },
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 25
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            25,
+                            40,
+                            50,
+                            60,
+                            70,
+                            80
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "루트 삭제 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 50
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 70
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 60
+            },
+            {
+                "operation": "insert",
+                "value": 80
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "delete",
+                    "value": 50
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            20,
+                            30,
+                            40,
+                            60,
+                            70,
+                            80
+                        ]
+                    },
+                    {
+                        "type": "rootColor",
+                        "expected": "black"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "빨간 노드 삭제 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 5
+            },
+            {
+                "operation": "insert",
+                "value": 15
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "delete",
+                    "value": 5
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            10,
+                            15,
+                            20,
+                            30
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Double Black 해결 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 30
+            },
+            {
+                "operation": "insert",
+                "value": 20
+            },
+            {
+                "operation": "insert",
+                "value": 40
+            },
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 25
+            },
+            {
+                "operation": "insert",
+                "value": 35
+            },
+            {
+                "operation": "insert",
+                "value": 50
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "delete",
+                    "value": 10
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            20,
+                            25,
+                            30,
+                            35,
+                            40,
+                            50
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "중복 값 삽입 방지 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 5
+            },
+            {
+                "operation": "insert",
+                "value": 15
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 10
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            5,
+                            10,
+                            15
+                        ]
+                    }
+                ]
+            },
+            {
+                "operation": {
+                    "type": "insert",
+                    "value": 5
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            5,
+                            10,
+                            15
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "극단적 불균형 입력 테스트",
+        "initialOperations": [],
+        "testSteps": [
+            {
+                "operations": [
+                    {
+                        "type": "insert",
+                        "value": 1
+                    },
+                    {
+                        "type": "insert",
+                        "value": 2
+                    },
+                    {
+                        "type": "insert",
+                        "value": 3
+                    },
+                    {
+                        "type": "insert",
+                        "value": 4
+                    },
+                    {
+                        "type": "insert",
+                        "value": 5
+                    },
+                    {
+                        "type": "insert",
+                        "value": 6
+                    },
+                    {
+                        "type": "insert",
+                        "value": 7
+                    },
+                    {
+                        "type": "insert",
+                        "value": 8
+                    },
+                    {
+                        "type": "insert",
+                        "value": 9
+                    },
+                    {
+                        "type": "insert",
+                        "value": 10
+                    }
+                ],
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10
+                        ]
+                    },
+                    {
+                        "type": "maxBlackHeight",
+                        "expected": 5
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "존재하지 않는 노드 삭제 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 5
+            },
+            {
+                "operation": "insert",
+                "value": 15
+            }
+        ],
+        "testSteps": [
+            {
+                "operation": {
+                    "type": "delete",
+                    "value": 20
+                },
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            5,
+                            10,
+                            15
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Wikipedia 예제 시나리오",
+        "initialOperations": [],
+        "testSteps": [
+            {
+                "operations": [
+                    {
+                        "type": "insert",
+                        "value": 13
+                    },
+                    {
+                        "type": "insert",
+                        "value": 8
+                    },
+                    {
+                        "type": "insert",
+                        "value": 17
+                    },
+                    {
+                        "type": "insert",
+                        "value": 1
+                    },
+                    {
+                        "type": "insert",
+                        "value": 11
+                    },
+                    {
+                        "type": "insert",
+                        "value": 15
+                    },
+                    {
+                        "type": "insert",
+                        "value": 25
+                    },
+                    {
+                        "type": "insert",
+                        "value": 6
+                    },
+                    {
+                        "type": "insert",
+                        "value": 22
+                    },
+                    {
+                        "type": "insert",
+                        "value": 27
+                    }
+                ],
+                "assertions": [
+                    {
+                        "type": "redBlackValid",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": [
+                            1,
+                            6,
+                            8,
+                            11,
+                            13,
+                            15,
+                            17,
+                            22,
+                            25,
+                            27
+                        ]
+                    },
+                    {
+                        "type": "rootColor",
+                        "expected": "black"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "모든 노드 삭제 후 빈 트리 시나리오",
+        "initialOperations": [
+            {
+                "operation": "insert",
+                "value": 10
+            },
+            {
+                "operation": "insert",
+                "value": 5
+            },
+            {
+                "operation": "insert",
+                "value": 15
+            },
+            {
+                "operation": "insert",
+                "value": 3
+            },
+            {
+                "operation": "insert",
+                "value": 7
+            }
+        ],
+        "testSteps": [
+            {
+                "operations": [
+                    {
+                        "type": "delete",
+                        "value": 3
+                    },
+                    {
+                        "type": "delete",
+                        "value": 7
+                    },
+                    {
+                        "type": "delete",
+                        "value": 5
+                    },
+                    {
+                        "type": "delete",
+                        "value": 15
+                    },
+                    {
+                        "type": "delete",
+                        "value": 10
+                    }
+                ],
+                "assertions": [
+                    {
+                        "type": "isEmpty",
+                        "expected": true
+                    },
+                    {
+                        "type": "traverseInOrder",
+                        "expected": []
+                    }
+                ]
+            }
+        ]
+    }
+]
