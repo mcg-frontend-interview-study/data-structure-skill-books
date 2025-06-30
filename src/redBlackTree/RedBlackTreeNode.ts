@@ -22,8 +22,8 @@ export class RedBlackTreeNode<T> implements TreeNodeInterface<T> {
   public blackChip: boolean = false;
 
   public value: T;
-  public left: TreeNodeInterface<T> | null;
-  public right: TreeNodeInterface<T> | null;
+  public left: TreeNodeInterface<T>;
+  public right: TreeNodeInterface<T>;
 
   constructor(value: T, nilNode: NilNode) {
     this.value = value;

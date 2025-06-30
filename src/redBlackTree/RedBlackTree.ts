@@ -1,20 +1,12 @@
-/**
- * Red-Black Tree 구현
- * 자동 균형 유지를 위해 5가지 속성을 만족해야 함
- * TNULL 센티넬 노드로 null 처리를 단순화
- */
-
 import {Comparator, COMPARISON_RESULT, defaultNumberComparator} from '../comparator/comparator';
 import {NilNode, RedBlackTreeNode, TreeNodeInterface} from './RedBlackTreeNode';
 
 export class RedBlackTree<T> {
-  private readonly TNULL: NilNode;
-  private _root: TreeNodeInterface<T>;
+  private readonly TNULL: NilNode = new NilNode();
+  private _root: TreeNodeInterface<T> = this.TNULL;
   private _comparator: Comparator<T>;
 
   constructor(comparator: Comparator<T>) {
-    this.TNULL = new NilNode();
-    this._root = this.TNULL;
     this._comparator = comparator;
   }
 
@@ -26,21 +18,25 @@ export class RedBlackTree<T> {
     const newNode = new RedBlackTreeNode<T>(value, this.TNULL);
 
     let parentNode: RedBlackTreeNode<T> | null = null;
-    let currentNode: TreeNodeInterface<T> = this._root;
+    let comparisonTargetNode: TreeNodeInterface<T> = this._root;
 
-    while (currentNode instanceof RedBlackTreeNode) {
-      parentNode = currentNode;
+    // 비교 대상이 유의미한 노드일 때
+    while (comparisonTargetNode instanceof RedBlackTreeNode) {
+      parentNode = comparisonTargetNode;
       const comparisonResult = this._comparator(newNode.value, parentNode.value);
+
       if (comparisonResult === COMPARISON_RESULT.LESS_THAN) {
-        currentNode = parentNode.left || this.TNULL;
+        comparisonTargetNode = parentNode.left;
       } else if (comparisonResult === COMPARISON_RESULT.GREATER_THAN) {
-        currentNode = parentNode.right || this.TNULL;
+        comparisonTargetNode = parentNode.right;
       } else {
         return; // 중복 값 허용 안함
       }
     }
+    // parentNode는 유의미 노드
 
     newNode.parent = parentNode;
+    // 루트인 경우 (while문 진행이 안되기 때문에 parentNode = null)
     if (parentNode === null) {
       this._root = newNode;
     } else if (this._comparator(newNode.value, parentNode.value) === COMPARISON_RESULT.LESS_THAN) {
@@ -49,11 +45,13 @@ export class RedBlackTree<T> {
       parentNode.right = newNode;
     }
 
+    // 새로 추가된 노드가 root인 경우
     if (newNode.parent === null) {
       newNode.color = '#000';
       return;
     }
 
+    // 새로 추가되는 노드의 부모가 root인 경우, 어차피 black이고 자녀는 red이기 때문에 룰 위반 없음. fix 로직 실행을 막기 위한 얼리 리턴
     if (newNode.parent.parent === null) {
       return;
     }
