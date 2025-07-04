@@ -1,4 +1,6 @@
+import {FindStatusCode} from './../constants/statusCode';
 import {Comparator, COMPARISON_RESULT, defaultNumberComparator} from '../comparator/comparator';
+import {ActionHasResultStatusCode, ActionStatusCode, STATUS_CODE} from '../constants/statusCode';
 import {NilNode, RedBlackTreeNode, TreeNodeInterface} from './RedBlackTreeNode';
 
 export class RedBlackTree<T> {
@@ -20,7 +22,8 @@ export class RedBlackTree<T> {
     let parentNode: RedBlackTreeNode<T> | null = null;
     let comparisonTargetNode: TreeNodeInterface<T> = this._root;
 
-    // 비교 대상이 유의미한 노드일 때
+    // parentNode 찾기. 실핼 결과는 null 또는 RedBlackTreeNode
+    // 비교 대상이 유의미한 노드일때
     while (comparisonTargetNode instanceof RedBlackTreeNode) {
       parentNode = comparisonTargetNode;
       const comparisonResult = this._comparator(newNode.value, parentNode.value);
@@ -39,6 +42,8 @@ export class RedBlackTree<T> {
     // 루트인 경우 (while문 진행이 안되기 때문에 parentNode = null)
     if (parentNode === null) {
       this._root = newNode;
+
+      // parentNode가 RedBlackTreeNode로 validNode일 때 = 비교 후 left, right 넣기
     } else if (this._comparator(newNode.value, parentNode.value) === COMPARISON_RESULT.LESS_THAN) {
       parentNode.left = newNode;
     } else {
@@ -59,89 +64,130 @@ export class RedBlackTree<T> {
     this._fixWhenInsert(newNode);
   }
 
+  // 여기는 parentNode가 있으며 그게 RedBlackTreeNode인 경우 진입.
   private _fixWhenInsert(insertedNode: RedBlackTreeNode<T>) {
-    let currentNode = insertedNode;
-    while (currentNode.parent && currentNode.parent.color === '#f00') {
-      const parentNode = currentNode.parent as RedBlackTreeNode<T>;
-      const grandParentNode = parentNode.parent as RedBlackTreeNode<T>;
+    let childNode = insertedNode;
 
+    // 부모가 있고, 부모가 red 라면 실행
+    while (childNode.parent && childNode.parent.color === '#f00') {
+      let parentNode = childNode.parent;
+      const grandParentNode = parentNode.parent;
+
+      // 조부가 없다면 부모 자식만 있는 상황(높이 2)이고 이때는 부모를 black으로 바꾸기만 하면 됨.
       if (!grandParentNode) break;
 
+      // 부모가 조부의 오른쪽이라면
       if (parentNode === grandParentNode.right) {
+        // 부모의 형제는 왼쪽
         const uncleNode = grandParentNode.left;
+
+        // case 1. 부모 형제가 red
         if (uncleNode instanceof RedBlackTreeNode && uncleNode.color === '#f00') {
+          // [1] switch
           uncleNode.color = '#000';
           parentNode.color = '#000';
           grandParentNode.color = '#f00';
-          currentNode = grandParentNode;
+
+          // [2] bubbling
+          childNode = grandParentNode;
         } else {
-          if (currentNode === parentNode.left) {
-            currentNode = parentNode;
-            this._rotateRight(currentNode);
+          // case 2. 형제가 없거나 black인 경우
+          // case 2.1. 꺾임
+          if (childNode === parentNode.left) {
+            // [1] 꺾임 풀기
+            this._rotateRight(parentNode);
+            [childNode, parentNode] = [parentNode, childNode]; // 참조 정리
           }
-          const newParent = currentNode.parent as RedBlackTreeNode<T>;
-          const newGrandParent = newParent?.parent as RedBlackTreeNode<T>;
-          if (newParent && newGrandParent) {
-            newParent.color = '#000';
-            newGrandParent.color = '#f00';
-            this._rotateLeft(newGrandParent);
-          }
+
+          // case 2.2. 직선
+          // [2] 싱글 교환
+          parentNode.color = '#000';
+          grandParentNode.color = '#f00';
+
+          // [3] 싱글 회전
+          this._rotateLeft(grandParentNode);
         }
       } else {
+        // 부모 - 조상 - 부모 형제
         const uncleNode = grandParentNode.right;
+
+        // case 1. 부모 형제가 red
         if (uncleNode instanceof RedBlackTreeNode && uncleNode.color === '#f00') {
+          // [1] switch
           uncleNode.color = '#000';
           parentNode.color = '#000';
           grandParentNode.color = '#f00';
-          currentNode = grandParentNode;
+
+          // [2] bubbling
+          childNode = grandParentNode;
         } else {
-          if (currentNode === parentNode.right) {
-            currentNode = parentNode;
-            this._rotateLeft(currentNode);
+          // case 2.1. 꺾임
+          if (childNode === parentNode.right) {
+            // [1] 꺾임 풀기
+            this._rotateLeft(parentNode);
+            [childNode, parentNode] = [parentNode, childNode]; // 참조 정리
           }
-          const newParent = currentNode.parent as RedBlackTreeNode<T>;
-          const newGrandParent = newParent?.parent as RedBlackTreeNode<T>;
-          if (newParent && newGrandParent) {
-            newParent.color = '#000';
-            newGrandParent.color = '#f00';
-            this._rotateRight(newGrandParent);
-          }
+
+          // case 2.2 직선
+          // [2] 싱글 교환
+          parentNode.color = '#000';
+          grandParentNode.color = '#f00';
+
+          // [3] 싱글 회전
+          this._rotateRight(grandParentNode);
         }
       }
-      if (currentNode === this._root) break;
+
+      if (childNode === this._root) break;
     }
+
     if (this._root instanceof RedBlackTreeNode) {
       this._root.color = '#000';
     }
   }
 
-  delete(value: T) {
+  delete(value: T): ActionHasResultStatusCode<RedBlackTreeNode<T>> {
     const targetNode = this.find(value);
-    if (targetNode === this.TNULL) return;
 
-    const nodeToDelete = targetNode as RedBlackTreeNode<T>;
-    let actuallyDeletedNode: TreeNodeInterface<T> = nodeToDelete;
+    if (targetNode === STATUS_CODE.NOT_FOUND) return STATUS_CODE.FAIL;
+
+    const nodeToDelete = targetNode;
+
+    let actuallyDeletedNode: RedBlackTreeNode<T> = nodeToDelete; // 계승자.
     let originalColor = actuallyDeletedNode.color;
-    let replacementNode: TreeNodeInterface<T>;
+    let replacementNode: RedBlackTreeNode<T> | NilNode;
 
-    if (nodeToDelete.left === this.TNULL) {
-      replacementNode = nodeToDelete.right || this.TNULL;
+    const rightNodeToDelete = nodeToDelete.right;
+    const leftNodeToDelete = nodeToDelete.left;
+    if (leftNodeToDelete instanceof NilNode && rightNodeToDelete instanceof NilNode) {
+      // 1. 리프 노드
+      replacementNode = this.TNULL;
       this._transplant(nodeToDelete, replacementNode);
-    } else if (nodeToDelete.right === this.TNULL) {
-      replacementNode = nodeToDelete.left || this.TNULL;
+    } else if (leftNodeToDelete instanceof NilNode) {
+      // 2. 오른쪽 자식만 있음
+      replacementNode = nodeToDelete.right;
+      this._transplant(nodeToDelete, replacementNode);
+    } else if (rightNodeToDelete instanceof NilNode) {
+      // 3. 왼쪽 자식만 있음.
+      replacementNode = nodeToDelete.left;
       this._transplant(nodeToDelete, replacementNode);
     } else {
-      actuallyDeletedNode = this._findSuccessor(nodeToDelete.right || this.TNULL);
+      // 4. 두 자식 다 있음.
+      actuallyDeletedNode = this._findSuccessor(rightNodeToDelete);
+
       originalColor = actuallyDeletedNode.color;
-      replacementNode = (actuallyDeletedNode as RedBlackTreeNode<T>).right || this.TNULL;
+      replacementNode = actuallyDeletedNode.right || this.TNULL; // 계승자는 왼쪽 자식이 없다. 오른쪽 자식은 있거나 없다.
 
       if (actuallyDeletedNode.parent === nodeToDelete) {
+        // 계승자가 직계 자식
         replacementNode.parent = actuallyDeletedNode;
       } else {
-        this._transplant(actuallyDeletedNode as RedBlackTreeNode<T>, replacementNode);
-        (actuallyDeletedNode as RedBlackTreeNode<T>).right = nodeToDelete.right;
-        if ((actuallyDeletedNode as RedBlackTreeNode<T>).right) {
-          ((actuallyDeletedNode as RedBlackTreeNode<T>).right as TreeNodeInterface<T>).parent = actuallyDeletedNode;
+        // 계승자가 직계 자식이 아님
+        this._transplant(actuallyDeletedNode, replacementNode);
+        // actuallyDeletedNode.right = nodeToDelete.right;
+
+        if (actuallyDeletedNode.right) {
+          actuallyDeletedNode.right.parent = actuallyDeletedNode;
         }
       }
       this._transplant(nodeToDelete, actuallyDeletedNode as RedBlackTreeNode<T>);
@@ -263,22 +309,29 @@ export class RedBlackTree<T> {
     currentDoubleBlackNode.blackChip = false;
   }
 
-  private _transplant(oldNode: TreeNodeInterface<T>, newNode: TreeNodeInterface<T>) {
+  private _transplant(oldNode: RedBlackTreeNode<T>, newNode: RedBlackTreeNode<T> | NilNode) {
     if (oldNode.parent === null) {
+      // 1. 지우려는 노드가 루트
       this._root = newNode;
     } else if (oldNode === oldNode.parent.left) {
+      // 2. 지우려는 노드가 부모의 왼쪽
       oldNode.parent.left = newNode;
     } else {
+      // 3. 지우려는 노드가 부모의 오른쪽
       oldNode.parent.right = newNode;
     }
+
+    // 부모 정리
     newNode.parent = oldNode.parent;
   }
 
-  private _findSuccessor(startNode: TreeNodeInterface<T>): RedBlackTreeNode<T> {
-    let currentNode = startNode as RedBlackTreeNode<T>;
-    while (currentNode.left !== this.TNULL && currentNode.left instanceof RedBlackTreeNode) {
+  private _findSuccessor(startNode: RedBlackTreeNode<T>): RedBlackTreeNode<T> {
+    let currentNode: RedBlackTreeNode<T> = startNode;
+
+    while (currentNode.left instanceof RedBlackTreeNode) {
       currentNode = currentNode.left;
     }
+
     return currentNode;
   }
 
@@ -322,8 +375,9 @@ export class RedBlackTree<T> {
     pivotNode.parent = leftChild;
   }
 
-  find(value: T): TreeNodeInterface<T> {
+  find(value: T): FindStatusCode<RedBlackTreeNode<T>> {
     let currentNode: TreeNodeInterface<T> = this._root;
+
     while (currentNode instanceof RedBlackTreeNode) {
       const comparisonResult = this._comparator(value, currentNode.value);
       if (comparisonResult === COMPARISON_RESULT.EQUAL) {
@@ -334,7 +388,8 @@ export class RedBlackTree<T> {
         currentNode = currentNode.right || this.TNULL;
       }
     }
-    return this.TNULL;
+
+    return STATUS_CODE.NOT_FOUND;
   }
 
   print() {
