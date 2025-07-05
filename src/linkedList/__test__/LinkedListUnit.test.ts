@@ -1,7 +1,7 @@
 import {STATUS_CODE} from '../../constants/statusCode';
 import {LinkedList, LinkedListNode} from '../LinkedList';
 
-describe('LinkedList-scenario test', () => {
+describe('LinkedList-unit test', () => {
   let linkedList: LinkedList<string>;
 
   beforeEach(() => {
@@ -25,5 +25,17 @@ describe('LinkedList-scenario test', () => {
     expect(linkedList.head?.next?.next?.value).toBe('5');
     expect(linkedList.head?.next?.next?.next?.value).toBe('3');
     expect(linkedList.head?.next?.next?.next?.next?.value).toBe('4');
+  });
+
+  test('delete', () => {
+    linkedList.insert('2');
+    linkedList.insert('3');
+    linkedList.insert('4');
+
+    expect(linkedList.delete()).toBe(STATUS_CODE.SUCCESS);
+    expect(linkedList.head?.value).toBe('1');
+    expect(linkedList.head?.next?.value).toBe('2');
+    expect(linkedList.head?.next?.next?.value).toBe('3');
+    expect(linkedList.head?.next?.next?.next?.value).toBe(undefined);
   });
 });
