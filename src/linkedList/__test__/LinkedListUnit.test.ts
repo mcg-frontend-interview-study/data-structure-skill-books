@@ -38,4 +38,12 @@ describe('LinkedList-unit test', () => {
     expect(linkedList.head?.next?.next?.value).toBe('3');
     expect(linkedList.head?.next?.next?.next?.value).toBe(undefined);
   });
+
+  test('printAll', () => {
+    linkedList.insert('2');
+    linkedList.insert('3');
+    linkedList.insert('4');
+
+    expect(linkedList.printAll()).toEqual(['1', '2', '3', '4']);
+  });
 });

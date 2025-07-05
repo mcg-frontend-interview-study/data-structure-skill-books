@@ -93,13 +93,23 @@ export class LinkedList<T> {
       return STATUS_CODE.FAIL;
     }
   }
+  // 연결리스트 모든 요소 출력
+  printAll() {
+    let currentNode = this.head;
+    const result: T[] = [];
+    while (currentNode !== null) {
+      result.push(currentNode.value as T);
+      currentNode = currentNode.next;
+    }
+    return result;
+  }
+  // 특정 위치의 데이터 출력
   // 특정 위치에 있는 노드 삭제
   // 특정 값을 갖는 노드 삭제
   // 연결리스트 길이
-  // 연결리스트 모든 요소 출력
-  // 특정 위치의 데이터 출력
 }
 
 // const linkedList = new LinkedList<string>(new LinkedListNode<string>('1'));
+// console.log(linkedList.printAll());
 // console.log(linkedList.head?.next?.next?.value);
 // console.log(linkedList.head?.next?.next?.next?.value);
