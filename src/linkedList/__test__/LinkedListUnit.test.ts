@@ -56,4 +56,15 @@ describe('LinkedList-unit test', () => {
     expect(linkedList.printAt(3)).toBe('4');
     expect(linkedList.printAt(4)).toBe(STATUS_CODE.FAIL);
   });
+
+  test('deleteAt', () => {
+    linkedList.insert('2');
+    linkedList.insert('3');
+    linkedList.insert('4');
+
+    expect(linkedList.deleteAt(2)).toBe(STATUS_CODE.SUCCESS);
+    expect(linkedList.head?.value).toBe('1');
+    expect(linkedList.head?.next?.value).toBe('2');
+    expect(linkedList.head?.next?.next?.value).toBe('4');
+  });
 });

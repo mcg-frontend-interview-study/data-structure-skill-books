@@ -93,6 +93,40 @@ export class LinkedList<T> {
       return STATUS_CODE.FAIL;
     }
   }
+  // 특정 위치에 있는 노드 삭제
+  deleteAt(index: number): ActionStatusCode {
+    try {
+      let currentIndex = 0;
+      let currentNode = this.head;
+
+      if (currentNode === null) {
+        return STATUS_CODE.FAIL;
+      }
+
+      if (index === 0) {
+        this.head = null;
+        return STATUS_CODE.SUCCESS;
+      }
+
+      while (index - 1 !== currentIndex) {
+        if (currentNode.next === null) {
+          return STATUS_CODE.FAIL;
+        }
+        currentNode = currentNode.next;
+        currentIndex++;
+      }
+      const tempNextNode = currentNode.next;
+      if (tempNextNode === null) {
+        return STATUS_CODE.FAIL;
+      }
+      currentNode.next = tempNextNode.next;
+      tempNextNode.next = null;
+
+      return STATUS_CODE.SUCCESS;
+    } catch (error) {
+      return STATUS_CODE.FAIL;
+    }
+  }
   // 연결리스트 모든 요소 출력
   printAll(): T[] {
     let currentNode = this.head;
@@ -121,12 +155,17 @@ export class LinkedList<T> {
       return STATUS_CODE.FAIL;
     }
   }
-  // 특정 위치에 있는 노드 삭제
   // 특정 값을 갖는 노드 삭제
   // 연결리스트 길이
 }
 
-// const linkedList = new LinkedList<string>(new LinkedListNode<string>('1'));
-// console.log(linkedList.printAll());
+const linkedList = new LinkedList<string>(new LinkedListNode<string>('1'));
+linkedList.insert('2');
+linkedList.insert('3');
+linkedList.insert('4');
+
+console.log(linkedList.printAll());
+console.log(linkedList.deleteAt(1));
+console.log(linkedList.printAll());
 // console.log(linkedList.head?.next?.next?.value);
 // console.log(linkedList.head?.next?.next?.next?.value);
