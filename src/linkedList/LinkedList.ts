@@ -94,7 +94,7 @@ export class LinkedList<T> {
     }
   }
   // 연결리스트 모든 요소 출력
-  printAll() {
+  printAll(): T[] {
     let currentNode = this.head;
     const result: T[] = [];
     while (currentNode !== null) {
@@ -104,6 +104,23 @@ export class LinkedList<T> {
     return result;
   }
   // 특정 위치의 데이터 출력
+  printAt(index: number): ActionStatusCode | T {
+    try {
+      let currentIndex = 0;
+      let currentNode = this.head;
+
+      while (currentNode !== null) {
+        if (currentIndex === index) {
+          return currentNode.value as T;
+        }
+        currentNode = currentNode.next;
+        currentIndex++;
+      }
+      return STATUS_CODE.FAIL;
+    } catch (error) {
+      return STATUS_CODE.FAIL;
+    }
+  }
   // 특정 위치에 있는 노드 삭제
   // 특정 값을 갖는 노드 삭제
   // 연결리스트 길이

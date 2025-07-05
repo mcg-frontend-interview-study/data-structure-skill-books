@@ -46,4 +46,14 @@ describe('LinkedList-unit test', () => {
 
     expect(linkedList.printAll()).toEqual(['1', '2', '3', '4']);
   });
+
+  test('printAt', () => {
+    linkedList.insert('2');
+    linkedList.insert('3');
+    linkedList.insert('4');
+
+    expect(linkedList.printAt(2)).toBe('3');
+    expect(linkedList.printAt(3)).toBe('4');
+    expect(linkedList.printAt(4)).toBe(STATUS_CODE.FAIL);
+  });
 });
