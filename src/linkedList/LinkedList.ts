@@ -1,3 +1,5 @@
+import {ActionStatusCode, STATUS_CODE} from '../constants/statusCode';
+
 export class LinkedListNode<T> {
   value: T | null;
   next: LinkedListNode<T> | null;
@@ -16,21 +18,59 @@ export class LinkedList<T> {
   }
 
   // 맨 뒤에 노드 추가
-  insert(value: T) {
-    const newNode = new LinkedListNode<T>(value);
+  insert(value: T): ActionStatusCode {
+    try {
+      const newNode = new LinkedListNode<T>(value);
 
-    if (this.head === null) {
-      this.head = newNode;
-    } else {
-      let currentNode = this.head;
-      while (currentNode?.next !== null) {
-        currentNode = currentNode.next;
+      if (this.head === null) {
+        this.head = newNode;
+      } else {
+        let currentNode = this.head;
+        while (currentNode?.next !== null) {
+          currentNode = currentNode.next;
+        }
+        currentNode.next = newNode;
       }
-      currentNode.next = newNode;
+      return STATUS_CODE.SUCCESS;
+    } catch (error) {
+      return STATUS_CODE.FAIL;
     }
   }
 
   // 특정 위치에 노드 추가
+  insertAt(value: T, index: number): ActionStatusCode {
+    try {
+      const newNode = new LinkedListNode<T>(value);
+
+      if (index === 0) {
+        this.head = newNode;
+        return STATUS_CODE.SUCCESS;
+      }
+
+      let currentIndex = 0;
+      let currentNode = this.head;
+
+      if (currentNode === null) {
+        return STATUS_CODE.FAIL;
+      }
+
+      while (index - 1 !== currentIndex) {
+        if (currentNode.next === null) {
+          return STATUS_CODE.FAIL;
+        }
+        currentNode = currentNode.next;
+        currentIndex++;
+      }
+
+      const tempNextNode = currentNode.next;
+      currentNode.next = newNode;
+      newNode.next = tempNextNode;
+      console.log(this.head);
+      return STATUS_CODE.SUCCESS;
+    } catch (error) {
+      return STATUS_CODE.FAIL;
+    }
+  }
   // 맨 뒤에 있는 노드 삭제
   // 특정 위치에 있는 노드 삭제
   // 특정 값을 갖는 노드 삭제

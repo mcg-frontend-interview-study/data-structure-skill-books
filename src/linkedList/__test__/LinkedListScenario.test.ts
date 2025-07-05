@@ -1,0 +1,29 @@
+import {STATUS_CODE} from '../../constants/statusCode';
+import {LinkedList, LinkedListNode} from '../LinkedList';
+
+describe('LinkedList-scenario test', () => {
+  let linkedList: LinkedList<string>;
+
+  beforeEach(() => {
+    linkedList = new LinkedList<string>(new LinkedListNode<string>('1'));
+  });
+
+  test('insert', () => {
+    expect(linkedList.insert('2')).toBe(STATUS_CODE.SUCCESS);
+    expect(linkedList.head?.value).toBe('1');
+    expect(linkedList.head?.next?.value).toBe('2');
+  });
+
+  test('insertAt', () => {
+    linkedList.insert('2');
+    linkedList.insert('3');
+    linkedList.insert('4');
+
+    expect(linkedList.insertAt('5', 2)).toBe(STATUS_CODE.SUCCESS);
+    expect(linkedList.head?.value).toBe('1');
+    expect(linkedList.head?.next?.value).toBe('2');
+    expect(linkedList.head?.next?.next?.value).toBe('5');
+    expect(linkedList.head?.next?.next?.next?.value).toBe('3');
+    expect(linkedList.head?.next?.next?.next?.next?.value).toBe('4');
+  });
+});
