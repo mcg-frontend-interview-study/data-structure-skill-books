@@ -43,6 +43,7 @@ export class LinkedList<T> {
       const newNode = new LinkedListNode<T>(value);
 
       if (index === 0) {
+        newNode.next = this.head;
         this.head = newNode;
         return STATUS_CODE.SUCCESS;
       }
@@ -54,7 +55,7 @@ export class LinkedList<T> {
         return STATUS_CODE.FAIL;
       }
 
-      while (index - 1 >= currentIndex) {
+      while (index - 1 !== currentIndex) {
         if (currentNode.next === null) {
           return STATUS_CODE.FAIL;
         }
@@ -104,7 +105,7 @@ export class LinkedList<T> {
       }
 
       if (index === 0) {
-        this.head = null;
+        this.head = currentNode.next;
         return STATUS_CODE.SUCCESS;
       }
 
@@ -169,7 +170,6 @@ export class LinkedList<T> {
         currentNode = currentNode.next;
         currentIndex++;
       }
-      console.log(currentIndex, currentNode);
       return STATUS_CODE.FAIL;
     } catch (error) {
       return STATUS_CODE.FAIL;
@@ -191,14 +191,3 @@ export class LinkedList<T> {
     return length;
   }
 }
-
-// const linkedList = new LinkedList<string>(new LinkedListNode<string>('1'));
-// linkedList.insert('2');
-// linkedList.insert('3');
-// linkedList.insert('4');
-
-// console.log(linkedList.printAll());
-// console.log(linkedList.deleteByValue('3'));
-// console.log(linkedList.printAll());
-// console.log(linkedList.head?.next?.next?.value);
-// console.log(linkedList.head?.next?.next?.next?.value);
