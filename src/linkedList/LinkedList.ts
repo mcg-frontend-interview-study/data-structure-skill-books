@@ -54,7 +54,7 @@ export class LinkedList<T> {
         return STATUS_CODE.FAIL;
       }
 
-      while (index - 1 !== currentIndex) {
+      while (index - 1 >= currentIndex) {
         if (currentNode.next === null) {
           return STATUS_CODE.FAIL;
         }
