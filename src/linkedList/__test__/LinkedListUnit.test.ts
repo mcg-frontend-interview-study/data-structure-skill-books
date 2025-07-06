@@ -79,4 +79,12 @@ describe('LinkedList-unit test', () => {
     expect(linkedList.head?.next?.next?.value).toBe('4');
     expect(linkedList.head?.next?.next?.next?.value).toBe(undefined);
   });
+
+  test('length', () => {
+    linkedList.insert('2');
+    linkedList.insert('3');
+    linkedList.insert('4');
+
+    expect(linkedList.length()).toBe(4);
+  });
 });

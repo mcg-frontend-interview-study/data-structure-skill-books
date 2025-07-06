@@ -176,15 +176,29 @@ export class LinkedList<T> {
     }
   }
   // 연결리스트 길이
+  length(): number {
+    let currentNode = this.head;
+    let length = 0;
+
+    if (currentNode === null) {
+      return 0;
+    }
+
+    while (currentNode !== null) {
+      length++;
+      currentNode = currentNode.next;
+    }
+    return length;
+  }
 }
 
-const linkedList = new LinkedList<string>(new LinkedListNode<string>('1'));
-linkedList.insert('2');
-linkedList.insert('3');
-linkedList.insert('4');
+// const linkedList = new LinkedList<string>(new LinkedListNode<string>('1'));
+// linkedList.insert('2');
+// linkedList.insert('3');
+// linkedList.insert('4');
 
-console.log(linkedList.printAll());
-console.log(linkedList.deleteByValue('3'));
-console.log(linkedList.printAll());
+// console.log(linkedList.printAll());
+// console.log(linkedList.deleteByValue('3'));
+// console.log(linkedList.printAll());
 // console.log(linkedList.head?.next?.next?.value);
 // console.log(linkedList.head?.next?.next?.next?.value);
