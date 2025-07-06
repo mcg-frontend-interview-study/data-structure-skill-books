@@ -54,7 +54,7 @@ describe('LinkedList-unit test', () => {
 
     expect(linkedList.printAt(2)).toBe('3');
     expect(linkedList.printAt(3)).toBe('4');
-    expect(linkedList.printAt(4)).toBe(STATUS_CODE.FAIL);
+    expect(linkedList.printAt(4)).toBe(STATUS_CODE.NOT_FOUND);
   });
 
   test('deleteAt', () => {
@@ -66,5 +66,17 @@ describe('LinkedList-unit test', () => {
     expect(linkedList.head?.value).toBe('1');
     expect(linkedList.head?.next?.value).toBe('2');
     expect(linkedList.head?.next?.next?.value).toBe('4');
+  });
+
+  test('deleteByValue', () => {
+    linkedList.insert('2');
+    linkedList.insert('3');
+    linkedList.insert('4');
+
+    expect(linkedList.deleteByValue('3')).toBe(STATUS_CODE.SUCCESS);
+    expect(linkedList.head?.value).toBe('1');
+    expect(linkedList.head?.next?.value).toBe('2');
+    expect(linkedList.head?.next?.next?.value).toBe('4');
+    expect(linkedList.head?.next?.next?.next?.value).toBe(undefined);
   });
 });

@@ -1,4 +1,4 @@
-import {ActionStatusCode, STATUS_CODE} from '../constants/statusCode';
+import {ActionStatusCode, FindStatusCode, STATUS_CODE} from '../constants/statusCode';
 
 export class LinkedListNode<T> {
   value: T | null;
@@ -138,7 +138,7 @@ export class LinkedList<T> {
     return result;
   }
   // 특정 위치의 데이터 출력
-  printAt(index: number): ActionStatusCode | T {
+  printAt(index: number): FindStatusCode<T> {
     try {
       let currentIndex = 0;
       let currentNode = this.head;
@@ -150,12 +150,31 @@ export class LinkedList<T> {
         currentNode = currentNode.next;
         currentIndex++;
       }
+      return STATUS_CODE.NOT_FOUND;
+    } catch (error) {
+      return STATUS_CODE.NOT_FOUND;
+    }
+  }
+  // 특정 값을 갖는 노드 중 첫 번째 노드 삭제
+  deleteByValue(value: T): ActionStatusCode {
+    try {
+      let currentNode = this.head;
+      let currentIndex = 0;
+
+      while (currentNode !== null) {
+        if (currentNode.value === value) {
+          this.deleteAt(currentIndex);
+          return STATUS_CODE.SUCCESS;
+        }
+        currentNode = currentNode.next;
+        currentIndex++;
+      }
+      console.log(currentIndex, currentNode);
       return STATUS_CODE.FAIL;
     } catch (error) {
       return STATUS_CODE.FAIL;
     }
   }
-  // 특정 값을 갖는 노드 삭제
   // 연결리스트 길이
 }
 
@@ -165,7 +184,7 @@ linkedList.insert('3');
 linkedList.insert('4');
 
 console.log(linkedList.printAll());
-console.log(linkedList.deleteAt(1));
+console.log(linkedList.deleteByValue('3'));
 console.log(linkedList.printAll());
 // console.log(linkedList.head?.next?.next?.value);
 // console.log(linkedList.head?.next?.next?.next?.value);
