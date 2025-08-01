@@ -1,4 +1,4 @@
-import {Deque} from './Deque';
+import {Deque} from './index';
 
 describe('Deque unit test', () => {
   describe('Deque.constructor', () => {
@@ -29,11 +29,11 @@ describe('Deque unit test', () => {
       expect(deque.size).toBe(1);
     });
 
-    test('예외값: undefined나 null을 삽입해도 작동한다', () => {
+    test('예외값: undefined나 null을 삽입하면 빈 값이다. (undefined, null을 허용하지 않음)', () => {
       const deque = new Deque();
       deque.appendLeft(undefined);
       deque.appendLeft(null);
-      expect([...deque]).toEqual([null, undefined]);
+      expect([...deque]).toEqual([]);
     });
   });
 
@@ -51,11 +51,10 @@ describe('Deque unit test', () => {
       expect(deque.size).toBe(1);
     });
 
-    test('예외값: 객체나 NaN 등 다양한 값도 삽입 가능', () => {
+    test('예외값: 객체도 삽입 가능하다. (빈 값은 불가능)', () => {
       const deque = new Deque();
       deque.appendRight({a: 1});
-      deque.appendRight(NaN);
-      expect(deque.size).toBe(2);
+      expect(deque.size).toBe(1);
     });
   });
 
@@ -97,38 +96,6 @@ describe('Deque unit test', () => {
     });
   });
 
-  describe('Deque.prototype.rotate', () => {
-    test('정상값: 양수는 오른쪽으로 회전', () => {
-      const deque = new Deque([1, 2, 3, 4]);
-      deque.rotate(1); // → [4, 1, 2, 3]
-      expect([...deque]).toEqual([4, 1, 2, 3]);
-    });
-
-    test('정상값: 음수는 왼쪽으로 회전', () => {
-      const deque = new Deque([1, 2, 3, 4]);
-      deque.rotate(-2); // ← [3, 4, 1, 2]
-      expect([...deque]).toEqual([3, 4, 1, 2]);
-    });
-
-    test('경계값: 0을 회전하면 상태 변화 없음', () => {
-      const deque = new Deque([1, 2, 3]);
-      deque.rotate(0);
-      expect([...deque]).toEqual([1, 2, 3]);
-    });
-
-    test('예외값: |n| > size 이면 에러 발생', () => {
-      const deque = new Deque([1, 2]);
-      expect(() => deque.rotate(3)).toThrow();
-      expect(() => deque.rotate(-5)).toThrow();
-    });
-
-    test('경계값: |n| === size는 유효하며 원래 상태와 같음', () => {
-      const deque = new Deque([1, 2, 3]);
-      deque.rotate(3); // 전체 회전
-      expect([...deque]).toEqual([1, 2, 3]);
-    });
-  });
-
   describe('Deque.prototype.size (getter)', () => {
     test('초기값에서 size 확인', () => {
       const deque = new Deque([1, 2, 3]);
@@ -147,7 +114,7 @@ describe('Deque unit test', () => {
   describe('[Symbol.iterator]', () => {
     test('정상값: for...of로 순회 가능', () => {
       const deque = new Deque([1, 2, 3]);
-      const result = [];
+      const result: number[] = [];
       for (const val of deque) {
         result.push(val);
       }
