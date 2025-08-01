@@ -87,7 +87,8 @@ deque.popRight();
 제거 후 Deque의 size가 1 감소한다.
 만일 Deque가 빈 상태에서 popLeft를 수행하면 undefined를 반환한다.
 
-- Time Complexity - O(1)
+- Time Complexity - O(N)
+  - O(N)인 이유는 내부 Linked List의 tail을 찾아가는 과정이 O(N)이기 때문이다.
 - Space Complexity - O(N)
 
 ### Deque.prototype.size
