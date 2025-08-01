@@ -100,21 +100,6 @@ console.log(deque.size);
 덱의 현재 길이를 알 수 있는 프로퍼티
 덱의 현재 길이를 반환해준다.
 
-### Deque.prototype.rotate
-
-```js
-const deque = new Deque([1, 2, 3]);
-deque.rotate(1);
-deque.rotate(-1);
-```
-
-덱을 파라미터 수만큼 회전시키는 기능이다.
-인자로 회전 수를 받으며, 양수이면 오른쪽으로 음수이면 왼쪽으로 Deque를 회전시킨다.
-회전 수의 절댓값이 Deque.prototype.size보다 크면 에러를 발생시킨다.
-
-- Time Complexity - O(N) : 덱의 길이와 동일한 수가 들어오면 O(1)이 N만큼 연산이 일어나므로
-- Space Complexity - O(N)
-
 ### [Symbol.iterator]()
 
 ```js
